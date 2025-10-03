@@ -1,0 +1,16 @@
+func get_by_id(id: int) -> {class_name}ORMEntry:
+	var query := "SELECT * FROM %s WHERE id=%s" % [get_name(), id]
+	var query_result: Array[Dictionary] = DB._run_query_and_get_result_array(query)
+	
+	if query_result.is_empty():
+		push_warning("Get by id for id %s returned nothing. Returning null" % id)
+		return null
+	
+	if query_result[0].has("error"):
+		push_error("Error while getting entry of id %s. Returning null. Error message: %s" % [id, query_result[0]["error"]])
+		return null
+	
+	if query_result.size() > 1:
+		push_warning("Get more then one result from get by id. Returning first result")
+	
+	return {class_name}ORMEntry.wrap_query_result(query_result[0])

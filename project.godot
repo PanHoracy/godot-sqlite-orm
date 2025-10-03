@@ -14,3 +14,18 @@ config/name="Godot SQLite ORM"
 config/tags=PackedStringArray("current", "plugin", "repo")
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+DB="*res://addons/sqlite_orm/scripts/database.gd"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/Todo_Manager/plugin.cfg", "res://addons/godot-sqlite/plugin.cfg", "res://addons/sqlite_orm/plugin.cfg")
+
+[file_customization]
+
+folder_colors={
+"res://addons/": "gray",
+"res://common/": "purple"
+}

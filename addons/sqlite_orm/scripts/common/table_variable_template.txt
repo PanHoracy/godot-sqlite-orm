@@ -1,0 +1,1 @@
+var {variable_name} := {class_name}ORM.new()
