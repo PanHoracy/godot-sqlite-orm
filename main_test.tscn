@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://b4lws8r6l8ugm"]
+[gd_scene load_steps=2 format=3 uid="uid://b4lws8r6l8ugm"]
+
+[ext_resource type="Script" uid="uid://dabjtogulw3xg" path="res://main_test.gd" id="1_54b8x"]
 
 [node name="MainTest" type="Control"]
 layout_mode = 3
@@ -7,3 +9,4 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_54b8x")

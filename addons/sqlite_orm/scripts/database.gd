@@ -1,13 +1,11 @@
 # Class name is set here to allow this script to appear in build-in documentation
-class_name Database extends Node
+class_name ORMDatabase extends Node
 
 ## Class that is used by main singleton of SQLite ORM plugin.
 
-#TODO rename to ORMDatabase
-
 const _UTILS := preload("res://addons/sqlite_orm/scripts/common/utils.gd")
 
-@onready var _tables: Array[Table] = [test_table, product_table, missing_table, ]
+@onready var _tables: Array[ORMTable] = [test_table, product_table, missing_table, ]
 
 var _db: SQLite
 var _db_path: String
@@ -17,17 +15,17 @@ class EvaluationResult:
 	extends RefCounted
 	
 	## Tables that have not been found in database
-	var missing_tables: Array[Table] = []
+	var missing_tables: Array[ORMTable] = []
 	## Names of the tables that have been found in database, 
 	## but are not in the list of tables
 	var invalid_tables: Array[String] = []
 	## Tables (keys) with missing columns (value as array of column names)
-	var missing_columns: Dictionary[Table, Array] = {}
+	var missing_columns: Dictionary[ORMTable, Array] = {}
 	## Similar to the [member missing_columns], but with columns that should not be
 	## in given table
-	var invalid_columns: Dictionary[Table, Array] = {}
+	var invalid_columns: Dictionary[ORMTable, Array] = {}
 	## Similar to the [member missing_columns], but with columns that have been altered
-	var altered_columns: Dictionary[Table, Array] = {}
+	var altered_columns: Dictionary[ORMTable, Array] = {}
 	
 	func _to_string() -> String:
 		return "<EvaluationResult: MT(%s) IT(%s) MC(%s) IC(%s) AC(%s)>" % [
@@ -158,23 +156,23 @@ func _ready() -> void:
 	if not evaluation_result.invalid_tables.is_empty():
 		_remove_tables(evaluation_result.invalid_tables)
 		
-	var tables_to_recreate: Dictionary[Table, Array] = {}
+	var tables_to_recreate: Dictionary[ORMTable, Array] = {}
 	if not evaluation_result.missing_columns.is_empty():
-		for table: Table in evaluation_result.missing_columns.keys():
+		for table: ORMTable in evaluation_result.missing_columns.keys():
 			if not tables_to_recreate.has(table):
 				tables_to_recreate[table] = []
 	if not evaluation_result.invalid_columns.is_empty():
-		for table: Table in evaluation_result.invalid_columns.keys():
+		for table: ORMTable in evaluation_result.invalid_columns.keys():
 			if not tables_to_recreate.has(table):
 				tables_to_recreate[table] = []
 	if not evaluation_result.altered_columns.is_empty():
-		for table: Table in evaluation_result.altered_columns.keys():
+		for table: ORMTable in evaluation_result.altered_columns.keys():
 			if not tables_to_recreate.has(table):
 				tables_to_recreate[table] = [evaluation_result.altered_columns[table]]
 			else:
 				tables_to_recreate[table].append_array(evaluation_result.altered_columns[table])
 	
-	for table: Table in tables_to_recreate.keys():
+	for table: ORMTable in tables_to_recreate.keys():
 		print(tables_to_recreate[table])
 		_recreate_table_preserve_data(table, Array(tables_to_recreate[table], TYPE_STRING, "", null))
 
@@ -238,13 +236,13 @@ func _evaluate_database() -> EvaluationResult:
 	return result
 
 
-func _recreate_table_preserve_data(table: Table, altered_columns: Array[String]) -> void:
+func _recreate_table_preserve_data(table: ORMTable, altered_columns: Array[String]) -> void:
 	#TODO Implement table recreating with current entries evaluation to fit new schema
 	# this can be done only after data insertion is imlepemented
 	print("Recreate table %s, with altered columns %s" % [table, altered_columns])
 
 
-func _create_tables(tables: Array[Table]) -> void:
+func _create_tables(tables: Array[ORMTable]) -> void:
 	for table in tables:
 		print("Creating table %s" % table.get_name())
 		_db.create_table(table.get_name(), table.get_table_dict())

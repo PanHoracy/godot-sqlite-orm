@@ -1,4 +1,4 @@
-extends IdTable
+extends ORMIdTable
 
-var test := IntColumn.new()
-var missing_column := StringColumn.new().set_not_null().set_default("Testing")
+var test := ORMIntColumn.new()
+var missing_column := ORMStringColumn.new().set_not_null().set_default("Testing")

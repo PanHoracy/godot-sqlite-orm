@@ -1,8 +1,7 @@
 @tool
-class_name TableParser extends RefCounted
+class_name ORMTableParser extends RefCounted
 
 #TODO parser is not removing table from database autoload after its file is removed
-#TODO rename to ORMTableParser
 
 const GEN_CLASSES_FOLDER_PATH: String = "res://addons/sqlite_orm/scripts/generated/"
 const TABLE_ENTRY_TEMPLATE_FILE_PATH: String = "res://addons/sqlite_orm/scripts/common/table_entry_template.txt"
@@ -54,7 +53,7 @@ static func parse(dir_path: String) -> void:
 		var columns: Dictionary[String, String] = _get_columns_from_table_definition_file(definition_file)
 		
 		#HACK This should be done in more realiable way (may cause edge case errors)
-		var has_id_extension: bool = definition_file.get_as_text().contains("IdTable")
+		var has_id_extension: bool = definition_file.get_as_text().contains("ORMIdTable")
 		
 		if has_id_extension:
 			columns["id"] = "int"
@@ -119,7 +118,7 @@ static func _clear_autoload_variables() -> void:
 	var end := autoload_content.find("#endregion")
 	autoload_content = autoload_content.erase(start, end-start-1)
 	
-	var tables_var := "@onready var _tables: Array[Table] = ["
+	var tables_var := "@onready var _tables: Array[ORMTable] = ["
 	start = autoload_content.find(tables_var) + tables_var.length()
 	end = autoload_content.find("]", start)
 	autoload_content = autoload_content.erase(start, end-start)
@@ -147,11 +146,11 @@ static func _get_columns_from_table_definition_file(table_definition_file: FileA
 		var end := line.find(":") if line.contains(":") else line.find("=")
 		var var_name := line.substr(start, end-start).strip_edges()
 		
-		if line.contains("IntColumn") or line.contains("PkColumn"):
+		if line.contains("ORMIntColumn") or line.contains("ORMPkColumn"):
 			columns[var_name] = "int"
-		elif line.contains("FloatColumn"):
+		elif line.contains("ORMFloatColumn"):
 			columns[var_name] = "float"
-		elif line.contains("StringColumn"):
+		elif line.contains("ORMStringColumn"):
 			columns[var_name] = "String"
 	
 	return columns
@@ -245,7 +244,7 @@ static func _add_gen_class_to_autoload(name_of_variable: String, name_of_class: 
 	var start := autoload_content.find(region_line) + region_line.length()
 	autoload_content = autoload_content.insert(start, "\n" + template_string.format({"variable_name": name_of_variable, "class_name": name_of_class}))
 	
-	var tables_var := "@onready var _tables: Array[Table] = ["
+	var tables_var := "@onready var _tables: Array[ORMTable] = ["
 	start = autoload_content.find(tables_var) + tables_var.length()
 	autoload_content = autoload_content.insert(start, "%s, " % name_of_variable)
 	

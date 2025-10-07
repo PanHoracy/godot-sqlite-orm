@@ -1,7 +1,5 @@
-class_name Column extends RefCounted
-
-#TODO Rename to ORMColumn
-#TODO Add class and members description
+@abstract
+class_name ORMColumn extends RefCounted
 
 enum SQLTypes {
 	INTEGER,
@@ -15,15 +13,15 @@ var name: String = ""
 var not_null: bool = false
 var unique: bool = false
 
-var _table: Table = null
+var _table: ORMTable = null
 
 
-func set_not_null(value: bool = true) -> Column:
+func set_not_null(value: bool = true) -> ORMColumn:
 	not_null = value
 	return self
 
 
-func set_unique(value: bool = true) -> Column:
+func set_unique(value: bool = true) -> ORMColumn:
 	unique = value
 	return self
 
@@ -32,25 +30,21 @@ func get_column_dict() -> Dictionary:
 	return {"not_null": not_null, "unique": unique}
 
 
-func get_table() -> Table:
+func get_table() -> ORMTable:
 	return _table
 
 
 func get_name_with_table() -> String:
 	return "%s.%s" % [get_table().get_name(), name]
 
-#FIXME Double of get_name_with_table()
-func get_as_condition_string() -> String:
-	return "%s.%s" % [get_table().get_name(), name]
 
-
-#region: Condition helpers
+#region Condition helpers
 
 
 func _get_value_as_right_string(value) -> String:
 	var right := ""
 	
-	if value is Column:
+	if value is ORMColumn:
 		right = "%s.%s" % [value.get_table().get_name(), value.name]
 	elif value is String:
 		right = "'%s'" % value
@@ -113,13 +107,19 @@ func between(low, high, inverse: bool = false) -> ORMCondition:
 	return ORMCondition.new(pattern % [test, low_string, high_string])
 
 
-func value_not_in(array: Array) -> ORMCondition:
-	return value_in(array, true)
-
-
-func value_in(array: Array, inverse: bool = false) -> ORMCondition:
+func value_not_in(...array: Array) -> ORMCondition:
 	var test := "%s.%s" % [get_table().get_name(), name]
-	var condition := ("%s IN (" % test) if not inverse else ("%s NOT IN (" % test)
+	var condition := "%s NOT IN (" % test
+	for element in array:
+		condition += _get_value_as_right_string(element) + ", "
+	condition = condition.substr(0, len(condition)-2)
+	condition += ")"
+	return ORMCondition.new(condition)
+
+
+func value_in(...array: Array) -> ORMCondition:
+	var test := "%s.%s" % [get_table().get_name(), name]
+	var condition := "%s IN (" % test
 	for element in array:
 		condition += _get_value_as_right_string(element) + ", "
 	condition = condition.substr(0, len(condition)-2)

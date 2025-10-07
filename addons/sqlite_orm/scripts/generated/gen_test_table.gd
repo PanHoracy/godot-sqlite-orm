@@ -47,9 +47,5 @@ func get_all() -> Array[TestTableORMEntry]:
 
 
 
-func _get_all_columns() -> Array[Column]:
-	var result: Array[Column] = [number, text, real, ]
-	
-	result.append_array(super._get_all_columns())
-	
-	return result
+func _get_all_columns() -> Array[ORMColumn]:
+	return [number, text, real, ]

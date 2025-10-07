@@ -26,7 +26,7 @@ func _init() -> void:
 
 
 func get_entry_dict() -> Dictionary:
-	var dict := super.get_entry_dict()
+	var dict := {}
 	
 	for field in _fields:
 		dict[field] = get(field)

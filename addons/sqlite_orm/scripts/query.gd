@@ -1,11 +1,5 @@
 class_name ORMQuery extends Node
 
-#TODO Add description to functions
-#TODO Add option to get data
-#TODO Add option to update data
-#TODO Add option to delete data
-#TODO Add support for subquery in WHERE and operators that uses that
-#TODO Add support for DISTINCT clause
 
 enum Actions {
 	UNSET,
@@ -30,7 +24,7 @@ class OrderingEntry:
 		self.column_name = column_name
 		self.order = order
 
-var _table: Table = null
+var _table: ORMTable = null
 var _action: Actions = Actions.UNSET
 var _condition: ORMCondition = null
 var _ordering: Array[OrderingEntry] = []
@@ -39,7 +33,7 @@ var _limit := -1
 var _limit_offset := 0
 
 
-func _init(table: Table) -> void:
+func _init(table: ORMTable) -> void:
 	_table = table
 
 
@@ -58,12 +52,12 @@ func where(condition: ORMCondition) -> ORMQuery:
 	return self
 
 
-func order_by_asc(column: Column) -> ORMQuery:
+func order_by_asc(column: ORMColumn) -> ORMQuery:
 	_ordering.push_back(OrderingEntry.new(column.get_name_with_table(), Orders.ASC))
 	return self
 
 
-func order_by_desc(column: Column) -> ORMQuery:
+func order_by_desc(column: ORMColumn) -> ORMQuery:
 	_ordering.push_back(OrderingEntry.new(column.get_name_with_table(), Orders.DESC))
 	return self
 
@@ -72,8 +66,8 @@ func clear_ordering() -> void:
 	_ordering = []
 
 
-func select_columns(columns: Array[Column]) -> ORMQuery:
-	_columns_to_query = Array(columns.map(func(c: Column): return c.get_name_with_table()), TYPE_STRING, "", null)
+func select_columns(columns: Array[ORMColumn]) -> ORMQuery:
+	_columns_to_query = Array(columns.map(func(c: ORMColumn): return c.get_name_with_table()), TYPE_STRING, "", null)
 	return self
 
 

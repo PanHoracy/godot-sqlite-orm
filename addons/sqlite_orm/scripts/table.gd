@@ -1,6 +1,5 @@
-class_name Table extends RefCounted
-
-#TODO Rename to ORMTable
+@abstract
+class_name ORMTable extends RefCounted
 
 var _name: String = ""
 
@@ -11,7 +10,7 @@ func _init() -> void:
 
 
 func _to_string() -> String:
-	return "<Table: %s>" % _name
+	return "<ORMTable: %s>" % _name
 
 
 func get_name() -> String:
@@ -27,5 +26,5 @@ func get_table_dict() -> Dictionary:
 	return dict
 
 
-func _get_all_columns() -> Array[Column]:
+func _get_all_columns() -> Array[ORMColumn]:
 	return []

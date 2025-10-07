@@ -1,4 +1,4 @@
-class_name PkColumn extends IntColumn
+class_name ORMPkColumn extends ORMIntColumn
 
 func _init() -> void:
 	not_null = true

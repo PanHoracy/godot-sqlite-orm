@@ -1,20 +1,20 @@
-class_name StringColumn extends Column
+class_name ORMStringColumn extends ORMColumn
 
 var use_default: bool = false
 var default: String = ""
 
 
-func set_default(value: String) -> StringColumn:
+func set_default(value: String) -> ORMStringColumn:
 	use_default = true
 	default = value
 	return self
 
 
-func set_not_null(value: bool = true) -> StringColumn:
+func set_not_null(value: bool = true) -> ORMStringColumn:
 	return super.set_not_null(value)
 
 
-func set_unique(value: bool = true) -> StringColumn:
+func set_unique(value: bool = true) -> ORMStringColumn:
 	return super.set_unique(value)
 
 

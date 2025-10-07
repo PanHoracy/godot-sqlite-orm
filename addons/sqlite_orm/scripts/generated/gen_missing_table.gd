@@ -63,9 +63,5 @@ func get_by_id(id: int) -> MissingTableORMEntry:
 
 
 
-func _get_all_columns() -> Array[Column]:
-	var result: Array[Column] = [test, missing_column, id, ]
-	
-	result.append_array(super._get_all_columns())
-	
-	return result
+func _get_all_columns() -> Array[ORMColumn]:
+	return [test, missing_column, id, ]

@@ -1,14 +1,14 @@
-class_name IdTable extends Table
+class_name ORMIdTable extends ORMTable
 
-var id := PkColumn.new()
+var id := ORMPkColumn.new()
 
 
 func _init() -> void:
 	id.name = "id"
 
 
-func _get_all_columns() -> Array[Column]:
-	var result: Array[Column] = [id]
+func _get_all_columns() -> Array[ORMColumn]:
+	var result: Array[ORMColumn] = [id]
 	
 	result.append_array(super._get_all_columns())
 	

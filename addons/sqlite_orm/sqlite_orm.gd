@@ -17,5 +17,5 @@ func _exit_tree() -> void:
 
 
 func _save_external_data() -> void:
-	TableParser.parse(ProjectSettings.get_setting(UTILS.TABLE_FOLDER_PATH_SP))
+	ORMTableParser.parse(ProjectSettings.get_setting(UTILS.TABLE_FOLDER_PATH_SP))
 	EditorInterface.get_resource_filesystem().scan()
