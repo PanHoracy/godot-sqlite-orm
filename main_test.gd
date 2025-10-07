@@ -6,7 +6,7 @@ func _ready() -> void:
 	var _number := DB.test_table.number
 	var _real := DB.test_table.real
 	var _text := DB.test_table.text
-	var result := query.order_by_asc(_number).order_by_desc(_real).get_as_raw_result()
+	var result := query.where(_real.is_not_null().and_also(_number.less_then(90))).get_as_raw_result()
 	for entry in result.map(func(d): return TestTableORMEntry.wrap_query_result(d)):
 		print(entry)
 	print(result.size())

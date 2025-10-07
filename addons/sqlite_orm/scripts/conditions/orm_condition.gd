@@ -11,7 +11,7 @@ func get_condition() -> String:
 	return _condition
 
 
-static func alternative(condition1: ORMCondition, condition2: ORMCondition) -> ORMCondition:
+static func or_(condition1: ORMCondition, condition2: ORMCondition) -> ORMCondition:
 	var con1_string := condition1.get_condition()
 	var con2_string := condition2.get_condition()
 	
@@ -24,7 +24,7 @@ static func alternative(condition1: ORMCondition, condition2: ORMCondition) -> O
 	return ORMCondition.new("(%s) OR (%s)" % [con1_string, con2_string])
 
 
-static func conjunction(condition1: ORMCondition, condition2: ORMCondition) -> ORMCondition:
+static func and_(condition1: ORMCondition, condition2: ORMCondition) -> ORMCondition:
 	var con1_string := condition1.get_condition()
 	var con2_string := condition2.get_condition()
 	
@@ -37,7 +37,7 @@ static func conjunction(condition1: ORMCondition, condition2: ORMCondition) -> O
 	return ORMCondition.new("(%s) AND (%s)" % [con1_string, con2_string])
 
 
-func conjoin_with(other_condition: ORMCondition) -> ORMCondition:
+func and_also(other_condition: ORMCondition) -> ORMCondition:
 	if _condition == "":
 		push_warning("Trying to combine empty condition with and to other condition")
 	
@@ -49,7 +49,7 @@ func conjoin_with(other_condition: ORMCondition) -> ORMCondition:
 	return self
 
 
-func alternate_with(other_condition: ORMCondition) -> ORMCondition:
+func or_else(other_condition: ORMCondition) -> ORMCondition:
 	if _condition == "":
 		push_warning("Trying to combine empty condition with or to other condition")
 	
