@@ -3,7 +3,46 @@ class_name ProductTableORM extends "res://common/scrpts/tables/product_table.gd"
 #TODO Add entry value validation. That is, let entry pass value inside of it to
 # column class, for it to validate, if it's correct
 
-#TODO Add descriptions to exposed table methods
+
+class ProductTableORMSelect:
+	extends ORMSelect
+	
+	
+	func _init(table: ORMTable) -> void:
+		super._init(table)
+	
+	
+	func get_entries() -> Array[ProductTableORMEntry]:
+		var raw_results := get_as_raw_result()
+		var entries: Array[ProductTableORMEntry] = []
+		for result in raw_results:
+			entries.push_back(ProductTableORMEntry.wrap_query_result(result))
+		return entries
+	
+	
+	func where(condition: ORMCondition) -> ProductTableORMSelect:
+		return super.where(condition) as ProductTableORMSelect
+	
+	
+	func order_by_asc(column: ORMColumn) -> ProductTableORMSelect:
+		return super.order_by_asc(column) as ProductTableORMSelect
+	
+	
+	func order_by_desc(column: ORMColumn) -> ProductTableORMSelect:
+		return super.order_by_desc(column) as ProductTableORMSelect
+	
+	
+	func limit(amount: int, offset: int = 0) -> ProductTableORMSelect:
+		return super.limit(amount, offset) as ProductTableORMSelect
+	
+	
+	func select_columns(columns: Array[ORMColumn]) -> ProductTableORMSelect:
+		return super.select_columns(columns) as ProductTableORMSelect
+	
+	
+	func distinct(value: bool = true) -> ProductTableORMSelect:
+		return super.distinct(value) as ProductTableORMSelect
+
 
 func _init() -> void:
 	_name = "product_table"
@@ -15,9 +54,12 @@ func _init() -> void:
 	
 	super._init()
 
-#HACK Should have type specification. Currenty removed becasue getting class of
-# a class nested in other class in autoload is not possible. 
-func put_entries_array_into_table(entries: Array) -> void:
+
+func create_select_query() -> ProductTableORMSelect:
+	return ProductTableORMSelect.new(self)
+
+
+func put_entries_array_into_table(entries: Array[ProductTableORMEntry]) -> void:
 	DB._get_db().insert_rows(get_name(), entries.map(func(e: ProductTableORMEntry): return e.get_entry_dict()) as Array[Dictionary])
 
 

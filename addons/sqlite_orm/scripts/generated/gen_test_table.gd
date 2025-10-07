@@ -3,7 +3,46 @@ class_name TestTableORM extends "res://common/scrpts/tables/test_table.gd"
 #TODO Add entry value validation. That is, let entry pass value inside of it to
 # column class, for it to validate, if it's correct
 
-#TODO Add descriptions to exposed table methods
+
+class TestTableORMSelect:
+	extends ORMSelect
+	
+	
+	func _init(table: ORMTable) -> void:
+		super._init(table)
+	
+	
+	func get_entries() -> Array[TestTableORMEntry]:
+		var raw_results := get_as_raw_result()
+		var entries: Array[TestTableORMEntry] = []
+		for result in raw_results:
+			entries.push_back(TestTableORMEntry.wrap_query_result(result))
+		return entries
+	
+	
+	func where(condition: ORMCondition) -> TestTableORMSelect:
+		return super.where(condition) as TestTableORMSelect
+	
+	
+	func order_by_asc(column: ORMColumn) -> TestTableORMSelect:
+		return super.order_by_asc(column) as TestTableORMSelect
+	
+	
+	func order_by_desc(column: ORMColumn) -> TestTableORMSelect:
+		return super.order_by_desc(column) as TestTableORMSelect
+	
+	
+	func limit(amount: int, offset: int = 0) -> TestTableORMSelect:
+		return super.limit(amount, offset) as TestTableORMSelect
+	
+	
+	func select_columns(columns: Array[ORMColumn]) -> TestTableORMSelect:
+		return super.select_columns(columns) as TestTableORMSelect
+	
+	
+	func distinct(value: bool = true) -> TestTableORMSelect:
+		return super.distinct(value) as TestTableORMSelect
+
 
 func _init() -> void:
 	_name = "test_table"
@@ -15,9 +54,12 @@ func _init() -> void:
 	
 	super._init()
 
-#HACK Should have type specification. Currenty removed becasue getting class of
-# a class nested in other class in autoload is not possible. 
-func put_entries_array_into_table(entries: Array) -> void:
+
+func create_select_query() -> TestTableORMSelect:
+	return TestTableORMSelect.new(self)
+
+
+func put_entries_array_into_table(entries: Array[TestTableORMEntry]) -> void:
 	DB._get_db().insert_rows(get_name(), entries.map(func(e: TestTableORMEntry): return e.get_entry_dict()) as Array[Dictionary])
 
 

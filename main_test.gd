@@ -2,12 +2,13 @@ extends Control
 
 
 func _ready() -> void:
-	var query := ORMQuery.new(DB.test_table)
 	var _number := DB.test_table.number
 	var _real := DB.test_table.real
 	var _text := DB.test_table.text
-	var result := query.where(_real.is_not_null().and_also(_number.less_then(90))).get_as_raw_result()
-	for entry in result.map(func(d): return TestTableORMEntry.wrap_query_result(d)):
+	var result := DB.test_table.create_select_query()\
+		.where(_real.is_not_null().and_also(_number.less_then(90)))\
+		.get_entries()
+	for entry in result:
 		print(entry)
 	print(result.size())
 
