@@ -2,15 +2,22 @@ extends Control
 
 
 func _ready() -> void:
-	var _number := DB.test_table.number
-	var _real := DB.test_table.real
-	var _text := DB.test_table.text
-	var result := DB.test_table.create_select_query()\
-		.where(_real.is_not_null().and_also(_number.less_then(90)))\
-		.get_entries()
-	for entry in result:
+	var table := DB.product_table
+	var entries := table.get_all()
+	for entry in entries:
 		print(entry)
-	print(result.size())
+	
+	print("-------")
+	
+	var updated_entry := entries[0]
+	updated_entry.price = 750.0
+	print(table.update_by_id(1, updated_entry))
+	
+	print("-------")
+	
+	entries = table.get_all()
+	for entry in entries:
+		print(entry)
 
 
 func read_all_from_test_table() -> void:

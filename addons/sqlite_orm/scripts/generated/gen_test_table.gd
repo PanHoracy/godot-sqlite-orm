@@ -20,6 +20,15 @@ class TestTableORMSelect:
 		return entries
 	
 	
+	func get_first_entry() -> TestTableORMEntry:
+		_limit = 1
+		var entries := get_entries()
+		
+		return entries[0] if not entries.is_empty() else null
+	
+	
+	#region Recasting base methods
+	
 	func where(condition: ORMCondition) -> TestTableORMSelect:
 		return super.where(condition) as TestTableORMSelect
 	
@@ -42,6 +51,55 @@ class TestTableORMSelect:
 	
 	func distinct(value: bool = true) -> TestTableORMSelect:
 		return super.distinct(value) as TestTableORMSelect
+	
+	#endregion
+
+
+class TestTableORMUpdate:
+	extends ORMQuery
+	
+	var _updated_row: TestTableORMEntry = null
+	
+	
+	func _init(table: ORMTable) -> void:
+		super._init(table)
+	
+	
+	func set_row(updated_row: TestTableORMEntry) -> TestTableORMUpdate:
+		_updated_row = updated_row
+		return self
+	
+	
+	func update() -> bool:
+		if _updated_row == null:
+			push_error("Cannot run update query without updated row")
+			return false
+		
+		return DB._get_db().update_rows(
+			_table.get_name(),
+			_condition.get_condition(),
+			_updated_row.get_entry_dict()
+		)
+	
+	
+	#region Recasting base methods
+	
+	func where(condition: ORMCondition) -> TestTableORMUpdate:
+		return super.where(condition) as TestTableORMUpdate
+	
+	
+	func order_by_asc(column: ORMColumn) -> TestTableORMUpdate:
+		return super.order_by_asc(column) as TestTableORMUpdate
+	
+	
+	func order_by_desc(column: ORMColumn) -> TestTableORMUpdate:
+		return super.order_by_desc(column) as TestTableORMUpdate
+	
+	
+	func limit(amount: int, offset: int = 0) -> TestTableORMUpdate:
+		return super.limit(amount, offset) as TestTableORMUpdate
+	
+	#endregion
 
 
 func _init() -> void:
@@ -57,6 +115,10 @@ func _init() -> void:
 
 func create_select_query() -> TestTableORMSelect:
 	return TestTableORMSelect.new(self)
+
+
+func create_update_query() -> TestTableORMUpdate:
+	return TestTableORMUpdate.new(self)
 
 
 func put_entries_array_into_table(entries: Array[TestTableORMEntry]) -> void:

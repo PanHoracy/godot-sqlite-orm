@@ -20,6 +20,15 @@ class ProductTableORMSelect:
 		return entries
 	
 	
+	func get_first_entry() -> ProductTableORMEntry:
+		_limit = 1
+		var entries := get_entries()
+		
+		return entries[0] if not entries.is_empty() else null
+	
+	
+	#region Recasting base methods
+	
 	func where(condition: ORMCondition) -> ProductTableORMSelect:
 		return super.where(condition) as ProductTableORMSelect
 	
@@ -42,6 +51,55 @@ class ProductTableORMSelect:
 	
 	func distinct(value: bool = true) -> ProductTableORMSelect:
 		return super.distinct(value) as ProductTableORMSelect
+	
+	#endregion
+
+
+class ProductTableORMUpdate:
+	extends ORMQuery
+	
+	var _updated_row: ProductTableORMEntry = null
+	
+	
+	func _init(table: ORMTable) -> void:
+		super._init(table)
+	
+	
+	func set_row(updated_row: ProductTableORMEntry) -> ProductTableORMUpdate:
+		_updated_row = updated_row
+		return self
+	
+	
+	func update() -> bool:
+		if _updated_row == null:
+			push_error("Cannot run update query without updated row")
+			return false
+		
+		return DB._get_db().update_rows(
+			_table.get_name(),
+			_condition.get_condition(),
+			_updated_row.get_entry_dict()
+		)
+	
+	
+	#region Recasting base methods
+	
+	func where(condition: ORMCondition) -> ProductTableORMUpdate:
+		return super.where(condition) as ProductTableORMUpdate
+	
+	
+	func order_by_asc(column: ORMColumn) -> ProductTableORMUpdate:
+		return super.order_by_asc(column) as ProductTableORMUpdate
+	
+	
+	func order_by_desc(column: ORMColumn) -> ProductTableORMUpdate:
+		return super.order_by_desc(column) as ProductTableORMUpdate
+	
+	
+	func limit(amount: int, offset: int = 0) -> ProductTableORMUpdate:
+		return super.limit(amount, offset) as ProductTableORMUpdate
+	
+	#endregion
 
 
 func _init() -> void:
@@ -57,6 +115,10 @@ func _init() -> void:
 
 func create_select_query() -> ProductTableORMSelect:
 	return ProductTableORMSelect.new(self)
+
+
+func create_update_query() -> ProductTableORMUpdate:
+	return ProductTableORMUpdate.new(self)
 
 
 func put_entries_array_into_table(entries: Array[ProductTableORMEntry]) -> void:
@@ -102,6 +164,18 @@ func get_by_id(id: int) -> ProductTableORMEntry:
 		push_warning("Get more then one result from get by id. Returning first result")
 	
 	return ProductTableORMEntry.wrap_query_result(query_result[0])
+
+
+func update_by_id(id: int, updated_row: ProductTableORMEntry) -> bool:
+	if updated_row == null:
+		push_error("Cannot run update query when updated row is null")
+		return false
+	
+	return DB._get_db().update_rows(
+			get_name(),
+			"%s.%s = %s" % [get_name(), self.id.name, id],
+			updated_row.get_entry_dict()
+		)
 
 
 

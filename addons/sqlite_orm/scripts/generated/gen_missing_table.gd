@@ -20,6 +20,15 @@ class MissingTableORMSelect:
 		return entries
 	
 	
+	func get_first_entry() -> MissingTableORMEntry:
+		_limit = 1
+		var entries := get_entries()
+		
+		return entries[0] if not entries.is_empty() else null
+	
+	
+	#region Recasting base methods
+	
 	func where(condition: ORMCondition) -> MissingTableORMSelect:
 		return super.where(condition) as MissingTableORMSelect
 	
@@ -42,6 +51,55 @@ class MissingTableORMSelect:
 	
 	func distinct(value: bool = true) -> MissingTableORMSelect:
 		return super.distinct(value) as MissingTableORMSelect
+	
+	#endregion
+
+
+class MissingTableORMUpdate:
+	extends ORMQuery
+	
+	var _updated_row: MissingTableORMEntry = null
+	
+	
+	func _init(table: ORMTable) -> void:
+		super._init(table)
+	
+	
+	func set_row(updated_row: MissingTableORMEntry) -> MissingTableORMUpdate:
+		_updated_row = updated_row
+		return self
+	
+	
+	func update() -> bool:
+		if _updated_row == null:
+			push_error("Cannot run update query without updated row")
+			return false
+		
+		return DB._get_db().update_rows(
+			_table.get_name(),
+			_condition.get_condition(),
+			_updated_row.get_entry_dict()
+		)
+	
+	
+	#region Recasting base methods
+	
+	func where(condition: ORMCondition) -> MissingTableORMUpdate:
+		return super.where(condition) as MissingTableORMUpdate
+	
+	
+	func order_by_asc(column: ORMColumn) -> MissingTableORMUpdate:
+		return super.order_by_asc(column) as MissingTableORMUpdate
+	
+	
+	func order_by_desc(column: ORMColumn) -> MissingTableORMUpdate:
+		return super.order_by_desc(column) as MissingTableORMUpdate
+	
+	
+	func limit(amount: int, offset: int = 0) -> MissingTableORMUpdate:
+		return super.limit(amount, offset) as MissingTableORMUpdate
+	
+	#endregion
 
 
 func _init() -> void:
@@ -57,6 +115,10 @@ func _init() -> void:
 
 func create_select_query() -> MissingTableORMSelect:
 	return MissingTableORMSelect.new(self)
+
+
+func create_update_query() -> MissingTableORMUpdate:
+	return MissingTableORMUpdate.new(self)
 
 
 func put_entries_array_into_table(entries: Array[MissingTableORMEntry]) -> void:
@@ -102,6 +164,18 @@ func get_by_id(id: int) -> MissingTableORMEntry:
 		push_warning("Get more then one result from get by id. Returning first result")
 	
 	return MissingTableORMEntry.wrap_query_result(query_result[0])
+
+
+func update_by_id(id: int, updated_row: MissingTableORMEntry) -> bool:
+	if updated_row == null:
+		push_error("Cannot run update query when updated row is null")
+		return false
+	
+	return DB._get_db().update_rows(
+			get_name(),
+			"%s.%s = %s" % [get_name(), self.id.name, id],
+			updated_row.get_entry_dict()
+		)
 
 
 

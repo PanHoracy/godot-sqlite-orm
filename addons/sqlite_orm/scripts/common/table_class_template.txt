@@ -20,6 +20,15 @@ class {class_name}ORMSelect:
 		return entries
 	
 	
+	func get_first_entry() -> {class_name}ORMEntry:
+		_limit = 1
+		var entries := get_entries()
+		
+		return entries[0] if not entries.is_empty() else null
+	
+	
+	#region Recasting base methods
+	
 	func where(condition: ORMCondition) -> {class_name}ORMSelect:
 		return super.where(condition) as {class_name}ORMSelect
 	
@@ -42,6 +51,55 @@ class {class_name}ORMSelect:
 	
 	func distinct(value: bool = true) -> {class_name}ORMSelect:
 		return super.distinct(value) as {class_name}ORMSelect
+	
+	#endregion
+
+
+class {class_name}ORMUpdate:
+	extends ORMQuery
+	
+	var _updated_row: {class_name}ORMEntry = null
+	
+	
+	func _init(table: ORMTable) -> void:
+		super._init(table)
+	
+	
+	func set_row(updated_row: {class_name}ORMEntry) -> {class_name}ORMUpdate:
+		_updated_row = updated_row
+		return self
+	
+	
+	func update() -> bool:
+		if _updated_row == null:
+			push_error("Cannot run update query without updated row")
+			return false
+		
+		return DB._get_db().update_rows(
+			_table.get_name(),
+			_condition.get_condition(),
+			_updated_row.get_entry_dict()
+		)
+	
+	
+	#region Recasting base methods
+	
+	func where(condition: ORMCondition) -> {class_name}ORMUpdate:
+		return super.where(condition) as {class_name}ORMUpdate
+	
+	
+	func order_by_asc(column: ORMColumn) -> {class_name}ORMUpdate:
+		return super.order_by_asc(column) as {class_name}ORMUpdate
+	
+	
+	func order_by_desc(column: ORMColumn) -> {class_name}ORMUpdate:
+		return super.order_by_desc(column) as {class_name}ORMUpdate
+	
+	
+	func limit(amount: int, offset: int = 0) -> {class_name}ORMUpdate:
+		return super.limit(amount, offset) as {class_name}ORMUpdate
+	
+	#endregion
 
 
 func _init() -> void:
@@ -54,6 +112,10 @@ func _init() -> void:
 
 func create_select_query() -> {class_name}ORMSelect:
 	return {class_name}ORMSelect.new(self)
+
+
+func create_update_query() -> {class_name}ORMUpdate:
+	return {class_name}ORMUpdate.new(self)
 
 
 func put_entries_array_into_table(entries: Array[{class_name}ORMEntry]) -> void:

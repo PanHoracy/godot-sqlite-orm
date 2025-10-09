@@ -14,3 +14,15 @@ func get_by_id(id: int) -> {class_name}ORMEntry:
 		push_warning("Get more then one result from get by id. Returning first result")
 	
 	return {class_name}ORMEntry.wrap_query_result(query_result[0])
+
+
+func update_by_id(id: int, updated_row: {class_name}ORMEntry) -> bool:
+	if updated_row == null:
+		push_error("Cannot run update query when updated row is null")
+		return false
+	
+	return DB._get_db().update_rows(
+			get_name(),
+			"%s.%s = %s" % [get_name(), self.id.name, id],
+			updated_row.get_entry_dict()
+		)
