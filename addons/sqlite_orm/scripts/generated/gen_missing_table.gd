@@ -30,78 +30,74 @@ class MissingTableORMSelect:
 	#region Recasting base methods
 	
 	func where(condition: ORMCondition) -> MissingTableORMSelect:
-		return super.where(condition) as MissingTableORMSelect
+		super.where(condition)
+		return self
 	
 	
 	func order_by_asc(column: ORMColumn) -> MissingTableORMSelect:
-		return super.order_by_asc(column) as MissingTableORMSelect
+		super.order_by_asc(column)
+		return self
 	
 	
 	func order_by_desc(column: ORMColumn) -> MissingTableORMSelect:
-		return super.order_by_desc(column) as MissingTableORMSelect
+		super.order_by_desc(column)
+		return self
 	
 	
 	func limit(amount: int, offset: int = 0) -> MissingTableORMSelect:
-		return super.limit(amount, offset) as MissingTableORMSelect
+		super.limit(amount, offset)
+		return self
 	
 	
 	func select_columns(columns: Array[ORMColumn]) -> MissingTableORMSelect:
-		return super.select_columns(columns) as MissingTableORMSelect
+		super.select_columns(columns)
+		return self
 	
 	
 	func distinct(value: bool = true) -> MissingTableORMSelect:
-		return super.distinct(value) as MissingTableORMSelect
+		super.distinct(value)
+		return self
 	
 	#endregion
 
 
 class MissingTableORMUpdate:
-	extends ORMQueryWithLimitOrder
-	
-	var _updated_row: MissingTableORMEntry = null
+	extends ORMUpdate
 	
 	
 	func _init(table: ORMTable) -> void:
 		super._init(table)
 	
 	
-	func set_row(updated_row: MissingTableORMEntry) -> MissingTableORMUpdate:
-		_updated_row = updated_row
+	#region Recasting base methods
+	
+	func set_updated_row(updated_row: ORMEntry) -> MissingTableORMUpdate:
+		super.set_updated_row(updated_row)
+		return self
+	
+	func where(condition: ORMCondition) -> MissingTableORMUpdate:
+		super.where(condition)
 		return self
 	
 	
-	func update() -> bool:
-		if _updated_row == null:
-			push_error("Cannot run update query without updated row")
-			return false
-		
-		var condition := "1 = 1"
-		if _condition != null:
-			condition = _condition.get_condition()
-		
-		return DB._get_db().update_rows(
-			_table.get_name(),
-			condition,
-			_updated_row.get_entry_dict()
-		)
-	
-	
-	#region Recasting base methods
-	
-	func where(condition: ORMCondition) -> MissingTableORMUpdate:
-		return super.where(condition) as MissingTableORMUpdate
-	
-	
 	func order_by_asc(column: ORMColumn) -> MissingTableORMUpdate:
-		return super.order_by_asc(column) as MissingTableORMUpdate
+		super.order_by_asc(column)
+		return self
 	
 	
 	func order_by_desc(column: ORMColumn) -> MissingTableORMUpdate:
-		return super.order_by_desc(column) as MissingTableORMUpdate
+		super.order_by_desc(column)
+		return self
 	
 	
 	func limit(amount: int, offset: int = 0) -> MissingTableORMUpdate:
-		return super.limit(amount, offset) as MissingTableORMUpdate
+		super.limit(amount, offset)
+		return self
+	
+	
+	func select_columns(columns: Array[ORMColumn]) -> MissingTableORMUpdate:
+		super.select_columns(columns)
+		return self
 	
 	#endregion
 
@@ -184,6 +180,10 @@ func update_by_id(id: int, updated_row: MissingTableORMEntry) -> bool:
 			"%s.%s = %s" % [get_name(), self.id.name, id],
 			updated_row.get_entry_dict()
 		)
+
+
+func delete_by_id(id: int) -> bool:
+	return DB._get_db().delete_rows(get_name(), "%s.id = %s" % [get_name(), id])
 
 
 

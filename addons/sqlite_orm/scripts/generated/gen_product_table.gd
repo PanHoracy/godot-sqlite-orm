@@ -30,78 +30,74 @@ class ProductTableORMSelect:
 	#region Recasting base methods
 	
 	func where(condition: ORMCondition) -> ProductTableORMSelect:
-		return super.where(condition) as ProductTableORMSelect
+		super.where(condition)
+		return self
 	
 	
 	func order_by_asc(column: ORMColumn) -> ProductTableORMSelect:
-		return super.order_by_asc(column) as ProductTableORMSelect
+		super.order_by_asc(column)
+		return self
 	
 	
 	func order_by_desc(column: ORMColumn) -> ProductTableORMSelect:
-		return super.order_by_desc(column) as ProductTableORMSelect
+		super.order_by_desc(column)
+		return self
 	
 	
 	func limit(amount: int, offset: int = 0) -> ProductTableORMSelect:
-		return super.limit(amount, offset) as ProductTableORMSelect
+		super.limit(amount, offset)
+		return self
 	
 	
 	func select_columns(columns: Array[ORMColumn]) -> ProductTableORMSelect:
-		return super.select_columns(columns) as ProductTableORMSelect
+		super.select_columns(columns)
+		return self
 	
 	
 	func distinct(value: bool = true) -> ProductTableORMSelect:
-		return super.distinct(value) as ProductTableORMSelect
+		super.distinct(value)
+		return self
 	
 	#endregion
 
 
 class ProductTableORMUpdate:
-	extends ORMQueryWithLimitOrder
-	
-	var _updated_row: ProductTableORMEntry = null
+	extends ORMUpdate
 	
 	
 	func _init(table: ORMTable) -> void:
 		super._init(table)
 	
 	
-	func set_row(updated_row: ProductTableORMEntry) -> ProductTableORMUpdate:
-		_updated_row = updated_row
+	#region Recasting base methods
+	
+	func set_updated_row(updated_row: ORMEntry) -> ProductTableORMUpdate:
+		super.set_updated_row(updated_row)
+		return self
+	
+	func where(condition: ORMCondition) -> ProductTableORMUpdate:
+		super.where(condition)
 		return self
 	
 	
-	func update() -> bool:
-		if _updated_row == null:
-			push_error("Cannot run update query without updated row")
-			return false
-		
-		var condition := "1 = 1"
-		if _condition != null:
-			condition = _condition.get_condition()
-		
-		return DB._get_db().update_rows(
-			_table.get_name(),
-			condition,
-			_updated_row.get_entry_dict()
-		)
-	
-	
-	#region Recasting base methods
-	
-	func where(condition: ORMCondition) -> ProductTableORMUpdate:
-		return super.where(condition) as ProductTableORMUpdate
-	
-	
 	func order_by_asc(column: ORMColumn) -> ProductTableORMUpdate:
-		return super.order_by_asc(column) as ProductTableORMUpdate
+		super.order_by_asc(column)
+		return self
 	
 	
 	func order_by_desc(column: ORMColumn) -> ProductTableORMUpdate:
-		return super.order_by_desc(column) as ProductTableORMUpdate
+		super.order_by_desc(column)
+		return self
 	
 	
 	func limit(amount: int, offset: int = 0) -> ProductTableORMUpdate:
-		return super.limit(amount, offset) as ProductTableORMUpdate
+		super.limit(amount, offset)
+		return self
+	
+	
+	func select_columns(columns: Array[ORMColumn]) -> ProductTableORMUpdate:
+		super.select_columns(columns)
+		return self
 	
 	#endregion
 
@@ -184,6 +180,10 @@ func update_by_id(id: int, updated_row: ProductTableORMEntry) -> bool:
 			"%s.%s = %s" % [get_name(), self.id.name, id],
 			updated_row.get_entry_dict()
 		)
+
+
+func delete_by_id(id: int) -> bool:
+	return DB._get_db().delete_rows(get_name(), "%s.id = %s" % [get_name(), id])
 
 
 

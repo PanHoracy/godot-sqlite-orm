@@ -1,6 +1,5 @@
 class_name ORMSelect extends ORMQueryWithLimitOrder
 
-var _columns_to_query: Array[String] = []
 var _distinct: bool = false
 
 
@@ -12,18 +11,9 @@ func get_as_raw_result() -> Array[Dictionary]:
 	return _run_query()
 
 
-func select_columns(columns: Array[ORMColumn]) -> ORMSelect:
-	_columns_to_query = Array(columns.map(func(c: ORMColumn): return c.get_name_with_table()), TYPE_STRING, "", null)
-	return self
-
-
 func distinct(value: bool = true) -> ORMSelect:
 	_distinct = true
 	return self
-
-
-func clear_selected_columns() -> void:
-	_columns_to_query = []
 
 
 func _run_query() -> Array[Dictionary]:
@@ -56,18 +46,27 @@ func _run_query() -> Array[Dictionary]:
 #region Recasting base methods
 
 func where(condition: ORMCondition) -> ORMSelect:
-	return super.where(condition) as ORMSelect
+	super.where(condition)
+	return self
 
 
 func order_by_asc(column: ORMColumn) -> ORMSelect:
-	return super.order_by_asc(column) as ORMSelect
+	super.order_by_asc(column)
+	return self
 
 
 func order_by_desc(column: ORMColumn) -> ORMSelect:
-	return super.order_by_desc(column) as ORMSelect
+	super.order_by_desc(column)
+	return self
 
 
 func limit(amount: int, offset: int = 0) -> ORMSelect:
-	return super.limit(amount, offset) as ORMSelect
+	super.limit(amount, offset)
+	return self
+
+
+func select_columns(columns: Array[ORMColumn]) -> ORMSelect:
+	super.select_columns(columns)
+	return self
 
 #endregion

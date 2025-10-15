@@ -9,6 +9,7 @@ enum Orders {
 var _ordering: Array[OrderingEntry] = []
 var _limit := -1
 var _limit_offset := 0
+var _columns_to_query: Array[String] = []
 
 class OrderingEntry:
 	extends RefCounted
@@ -25,12 +26,12 @@ func _init(table: ORMTable) -> void:
 	super._init(table)
 
 
-func order_by_asc(column: ORMColumn) -> ORMQuery:
+func order_by_asc(column: ORMColumn) -> ORMQueryWithLimitOrder:
 	_ordering.push_back(OrderingEntry.new(column.get_name_with_table(), Orders.ASC))
 	return self
 
 
-func order_by_desc(column: ORMColumn) -> ORMQuery:
+func order_by_desc(column: ORMColumn) -> ORMQueryWithLimitOrder:
 	_ordering.push_back(OrderingEntry.new(column.get_name_with_table(), Orders.DESC))
 	return self
 
@@ -39,7 +40,7 @@ func clear_ordering() -> void:
 	_ordering = []
 
 
-func limit(amount: int, offset: int = 0) -> ORMQuery:
+func limit(amount: int, offset: int = 0) -> ORMQueryWithLimitOrder:
 	if amount < 0 or offset < 0:
 		push_error("Limit and offset cannot be a negative number, aborting")
 		return self
@@ -56,3 +57,12 @@ func _get_ordering() -> String:
 		order += "%s %s, " % [order_entry.column_name, "ASC" if order_entry.order == Orders.ASC else "DESC"]
 	order = order.substr(0, len(order)-2)
 	return order
+
+
+func select_columns(columns: Array[ORMColumn]) -> ORMQueryWithLimitOrder:
+	_columns_to_query = Array(columns.map(func(c: ORMColumn): return c.get_name_with_table()), TYPE_STRING, "", null)
+	return self
+
+
+func clear_selected_columns() -> void:
+	_columns_to_query = []

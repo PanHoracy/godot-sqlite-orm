@@ -26,3 +26,7 @@ func update_by_id(id: int, updated_row: {class_name}ORMEntry) -> bool:
 			"%s.%s = %s" % [get_name(), self.id.name, id],
 			updated_row.get_entry_dict()
 		)
+
+
+func delete_by_id(id: int) -> bool:
+	return DB._get_db().delete_rows(get_name(), "%s.id = %s" % [get_name(), id])

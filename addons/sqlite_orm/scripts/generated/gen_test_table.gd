@@ -30,78 +30,74 @@ class TestTableORMSelect:
 	#region Recasting base methods
 	
 	func where(condition: ORMCondition) -> TestTableORMSelect:
-		return super.where(condition) as TestTableORMSelect
+		super.where(condition)
+		return self
 	
 	
 	func order_by_asc(column: ORMColumn) -> TestTableORMSelect:
-		return super.order_by_asc(column) as TestTableORMSelect
+		super.order_by_asc(column)
+		return self
 	
 	
 	func order_by_desc(column: ORMColumn) -> TestTableORMSelect:
-		return super.order_by_desc(column) as TestTableORMSelect
+		super.order_by_desc(column)
+		return self
 	
 	
 	func limit(amount: int, offset: int = 0) -> TestTableORMSelect:
-		return super.limit(amount, offset) as TestTableORMSelect
+		super.limit(amount, offset)
+		return self
 	
 	
 	func select_columns(columns: Array[ORMColumn]) -> TestTableORMSelect:
-		return super.select_columns(columns) as TestTableORMSelect
+		super.select_columns(columns)
+		return self
 	
 	
 	func distinct(value: bool = true) -> TestTableORMSelect:
-		return super.distinct(value) as TestTableORMSelect
+		super.distinct(value)
+		return self
 	
 	#endregion
 
 
 class TestTableORMUpdate:
-	extends ORMQueryWithLimitOrder
-	
-	var _updated_row: TestTableORMEntry = null
+	extends ORMUpdate
 	
 	
 	func _init(table: ORMTable) -> void:
 		super._init(table)
 	
 	
-	func set_row(updated_row: TestTableORMEntry) -> TestTableORMUpdate:
-		_updated_row = updated_row
+	#region Recasting base methods
+	
+	func set_updated_row(updated_row: ORMEntry) -> TestTableORMUpdate:
+		super.set_updated_row(updated_row)
+		return self
+	
+	func where(condition: ORMCondition) -> TestTableORMUpdate:
+		super.where(condition)
 		return self
 	
 	
-	func update() -> bool:
-		if _updated_row == null:
-			push_error("Cannot run update query without updated row")
-			return false
-		
-		var condition := "1 = 1"
-		if _condition != null:
-			condition = _condition.get_condition()
-		
-		return DB._get_db().update_rows(
-			_table.get_name(),
-			condition,
-			_updated_row.get_entry_dict()
-		)
-	
-	
-	#region Recasting base methods
-	
-	func where(condition: ORMCondition) -> TestTableORMUpdate:
-		return super.where(condition) as TestTableORMUpdate
-	
-	
 	func order_by_asc(column: ORMColumn) -> TestTableORMUpdate:
-		return super.order_by_asc(column) as TestTableORMUpdate
+		super.order_by_asc(column)
+		return self
 	
 	
 	func order_by_desc(column: ORMColumn) -> TestTableORMUpdate:
-		return super.order_by_desc(column) as TestTableORMUpdate
+		super.order_by_desc(column)
+		return self
 	
 	
 	func limit(amount: int, offset: int = 0) -> TestTableORMUpdate:
-		return super.limit(amount, offset) as TestTableORMUpdate
+		super.limit(amount, offset)
+		return self
+	
+	
+	func select_columns(columns: Array[ORMColumn]) -> TestTableORMUpdate:
+		super.select_columns(columns)
+		return self
 	
 	#endregion
 
