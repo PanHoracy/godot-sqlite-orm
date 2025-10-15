@@ -97,6 +97,9 @@ func get_table_schema(table_name: String) -> Dictionary[String, Dictionary]:
 	
 	# Extract information about columns, and split into dictionary, with column name
 	# as key
+	#FIXME Here if table was created in different method it might have different
+	# looking sql_text with will produce conflict. For example if database is backuped
+	# with SQLite Browser and then restored it will have quotes around column names
 	var sql_text: String = _db.query_result[0]["sql"]
 	var start: int = sql_text.find("(")+1
 	sql_text = sql_text.substr(start, sql_text.find(")")-start)

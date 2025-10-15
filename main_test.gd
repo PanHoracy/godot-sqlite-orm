@@ -2,16 +2,12 @@ extends Control
 
 
 func _ready() -> void:
-	var table := DB.product_table
+	var table := DB.test_table
 	var entries := table.get_all()
 	for entry in entries:
 		print(entry)
 	
 	print("-------")
-	
-	var updated_entry := entries[0]
-	updated_entry.price = 750.0
-	print(table.update_by_id(1, updated_entry))
 	
 	print("-------")
 	

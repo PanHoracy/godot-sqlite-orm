@@ -56,7 +56,7 @@ class MissingTableORMSelect:
 
 
 class MissingTableORMUpdate:
-	extends ORMQuery
+	extends ORMQueryWithLimitOrder
 	
 	var _updated_row: MissingTableORMEntry = null
 	
@@ -75,9 +75,13 @@ class MissingTableORMUpdate:
 			push_error("Cannot run update query without updated row")
 			return false
 		
+		var condition := "1 = 1"
+		if _condition != null:
+			condition = _condition.get_condition()
+		
 		return DB._get_db().update_rows(
 			_table.get_name(),
-			_condition.get_condition(),
+			condition,
 			_updated_row.get_entry_dict()
 		)
 	
@@ -119,6 +123,10 @@ func create_select_query() -> MissingTableORMSelect:
 
 func create_update_query() -> MissingTableORMUpdate:
 	return MissingTableORMUpdate.new(self)
+
+
+func create_delete_query() -> ORMDelete:
+	return ORMDelete.new(self)
 
 
 func put_entries_array_into_table(entries: Array[MissingTableORMEntry]) -> void:

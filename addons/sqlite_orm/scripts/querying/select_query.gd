@@ -1,4 +1,4 @@
-class_name ORMSelect extends ORMQuery
+class_name ORMSelect extends ORMQueryWithLimitOrder
 
 var _columns_to_query: Array[String] = []
 var _distinct: bool = false
