@@ -1,4 +1,4 @@
-class_name ORMUpdate extends ORMQueryWithLimitOrder
+class_name ORMUpdate extends ORMQueryWithLimitOrderSelect
 
 var _updated_row: ORMEntry = null
 
@@ -43,8 +43,8 @@ func update() -> bool:
 	if _limit > 0:
 		query += "\nLIMIT %s OFFSET %s" % [_limit, _limit_offset]
 	
-	print("Entered query: %s" % query)
-	return DB._get_db().query(query)
+	print("Entered query:\n%s" % query)
+	return DB._run_query(query)
 
 
 #region Recasting base methods

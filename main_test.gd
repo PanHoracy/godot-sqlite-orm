@@ -9,6 +9,8 @@ func _ready() -> void:
 	
 	print("-------")
 	
+	
+	
 	print("-------")
 	
 	entries = table.get_all()
@@ -52,17 +54,30 @@ func insert_things_to_product() -> void:
 
 func insert_things_to_test_table() -> void:
 	var test_entry := TestTableORMEntry.new()
-	var entries: Array = []
-	for i in 3:
+	var entries: Array[TestTableORMEntry] = []
+	for i in 10:
 		var entry := TestTableORMEntry.new()
 		entry.number = i+1
 		entry.text = "This is %s entry of array add" % i
 		entry.real = randf_range(0.0, 5.0)
 		entries.push_back(entry)
 	
-	test_entry.number = 1
+	test_entry.number = 11
 	test_entry.text = "This is a solo value"
 	test_entry.real = 5.5
 	
 	DB.test_table.put_entry_into_table(test_entry)
 	DB.test_table.put_entries_array_into_table(entries)
+
+
+func advanced_update_text() -> void:
+	var table := DB.test_table
+	var updated_row := TestTableORMEntry.new()
+	updated_row.number = 25
+	table.create_update_query()\
+		.set_updated_row(updated_row)\
+		.select_columns([table.number])\
+		.where(table.number.less_then(100))\
+		.order_by_asc(table.number)\
+		.limit(4)\
+		.update()

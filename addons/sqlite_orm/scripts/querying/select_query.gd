@@ -1,4 +1,4 @@
-class_name ORMSelect extends ORMQueryWithLimitOrder
+class_name ORMSelect extends ORMQueryWithLimitOrderSelect
 
 var _distinct: bool = false
 
@@ -33,13 +33,13 @@ func _run_query() -> Array[Dictionary]:
 	
 	var query := pattern % [columns_to_query_string, _table.get_name()]
 	if _condition != null:
-		query += "\n WHERE %s" % _condition.get_condition()
+		query += "\nWHERE %s" % _condition.get_condition()
 	if not _ordering.is_empty():
-		query += "\n ORDER BY %s" % _get_ordering()
+		query += "\nORDER BY %s" % _get_ordering()
 	if _limit > 0:
-		query += "\n LIMIT %s OFFSET %s" % [_limit, _limit_offset]
+		query += "\nLIMIT %s OFFSET %s" % [_limit, _limit_offset]
 	
-	print("Entered query: %s" % query)
+	print("Entered query:\n%s" % query)
 	return DB._run_query_and_get_result_array(query)
 
 

@@ -9,7 +9,6 @@ enum Orders {
 var _ordering: Array[OrderingEntry] = []
 var _limit := -1
 var _limit_offset := 0
-var _columns_to_query: Array[String] = []
 
 class OrderingEntry:
 	extends RefCounted
@@ -57,12 +56,3 @@ func _get_ordering() -> String:
 		order += "%s %s, " % [order_entry.column_name, "ASC" if order_entry.order == Orders.ASC else "DESC"]
 	order = order.substr(0, len(order)-2)
 	return order
-
-
-func select_columns(columns: Array[ORMColumn]) -> ORMQueryWithLimitOrder:
-	_columns_to_query = Array(columns.map(func(c: ORMColumn): return c.get_name_with_table()), TYPE_STRING, "", null)
-	return self
-
-
-func clear_selected_columns() -> void:
-	_columns_to_query = []
