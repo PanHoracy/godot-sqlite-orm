@@ -26,5 +26,13 @@ func get_table_dict() -> Dictionary:
 	return dict
 
 
+func get_row_count() -> int:
+	var query := "SELECT COUNT(*) AS RES FROM %s" % get_name()
+	
+	var result := DB._run_query_and_get_result_array(query)
+	
+	return result[0]["RES"]
+
+
 func _get_all_columns() -> Array[ORMColumn]:
 	return []
