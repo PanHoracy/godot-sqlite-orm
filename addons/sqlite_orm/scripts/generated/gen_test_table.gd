@@ -13,6 +13,10 @@ class TestTableORMSelect:
 	
 	
 	func get_entries() -> Array[TestTableORMEntry]:
+		if not _columns_to_query.is_empty():
+			push_error("Cannot set custom select_columns while using get_entries() and get_first_entry(). Use get_as_raw_result() instead")
+			return []
+		
 		var raw_results := get_as_raw_result()
 		var entries: Array[TestTableORMEntry] = []
 		for result in raw_results:

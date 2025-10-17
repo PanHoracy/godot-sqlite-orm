@@ -9,7 +9,7 @@ func _ready() -> void:
 	
 	print("-------")
 	
-	print("Row count: %s" % table.get_row_count())
+	print(table.create_select_query().select_columns([table.number]).get_as_raw_result())
 	
 	print("-------")
 	
