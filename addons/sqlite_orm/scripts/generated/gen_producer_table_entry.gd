@@ -1,17 +1,16 @@
-class_name MissingTableORMEntry extends ORMEntry
+class_name ProducerTableORMEntry extends ORMEntry
 
-const EXCLUDED_PROPERTIES: Array[String] = ["RefCounted", "script", "Built-in script", "_parent_table", "gen_missing_table_entry.gd", "_fields", "orm_entry.gd"]
+const EXCLUDED_PROPERTIES: Array[String] = ["RefCounted", "script", "Built-in script", "_parent_table", "gen_producer_table_entry.gd", "_fields", "orm_entry.gd"]
 
-var test: int
-var missing_column: String
+var producer_name: String
 var id: int
 
 
-static var _fields: Array[String] = ["test", "missing_column", "id"]
+static var _fields: Array[String] = ["producer_name", "id"]
 
 
-static func wrap_query_result(query_result: Dictionary) -> MissingTableORMEntry:
-	var entry := MissingTableORMEntry.new()
+static func wrap_query_result(query_result: Dictionary) -> ProducerTableORMEntry:
+	var entry := ProducerTableORMEntry.new()
 	
 	for field in _fields:
 		assert(query_result.has(field), "Invalid query result for that wrapper")
@@ -41,7 +40,7 @@ func get_entry_dict() -> Dictionary:
 
 
 func _to_string() -> String:
-	var message := "<MissingTableEntry: "
+	var message := "<ProducerTableEntry: "
 	for field in _fields:
 		message += "%s(%s), " % [field, get(field)]
 	message = message.erase(message.length()-2, 2)

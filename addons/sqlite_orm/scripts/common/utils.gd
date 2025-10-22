@@ -1,18 +1,19 @@
 extends Node
 
-#region: Settings keys and default values
+#region Settings keys and default values
+
 ## SP stands for Settings Path
 const SP_BASE: String = "plugins/SQLite ORM/"
 
-# Table folder path
+## Table folder path
 const TABLE_FOLDER_PATH_SP := SP_BASE + "Table folder path"
 const _DEFAULT_TABLE_FORLDER_PATH := "res://common/scrpts/tables/"
 
-# Database path
+## Database path
 const DATABASE_PATH_SP := SP_BASE + "Database path"
 const _DEFAULT_DATABASE_PATH := "user://database.db"
 
-# Verbosity level
+## Verbosity level
 const VERBOSITY_LEVEL_SP := SP_BASE + "Verbosity level"
 const _DEFAULT_VERBOSITY_LEVEL := 1
 const _VERBOSITY_LEVEL_PROPERTY_INFO := {
@@ -21,6 +22,11 @@ const _VERBOSITY_LEVEL_PROPERTY_INFO := {
 	"hint": PROPERTY_HINT_ENUM,
 	"hint_string": "Quiet,Normal,Verbose,Very Verbose"
 }
+
+## Are Foreign Keys enabled
+const ENABLE_FOREIGN_KEYS := SP_BASE + "Enable Foreign Keys"
+const _DEFAULT_ENABLE_FOREIGN_KEYS := true
+
 #endregion
 
 static func print_humanized_dict(dict: Dictionary, header: String = "Dictionary") -> void:
@@ -48,3 +54,7 @@ static func update_plugin_settings() -> void:
 		ProjectSettings.set_setting(VERBOSITY_LEVEL_SP, _DEFAULT_VERBOSITY_LEVEL)
 		ProjectSettings.set_initial_value(VERBOSITY_LEVEL_SP, _DEFAULT_VERBOSITY_LEVEL)
 		ProjectSettings.add_property_info(_VERBOSITY_LEVEL_PROPERTY_INFO)
+	
+	if not ProjectSettings.has_setting(ENABLE_FOREIGN_KEYS):
+		ProjectSettings.set_setting(ENABLE_FOREIGN_KEYS, _DEFAULT_ENABLE_FOREIGN_KEYS)
+		ProjectSettings.set_initial_value(ENABLE_FOREIGN_KEYS, _DEFAULT_ENABLE_FOREIGN_KEYS)

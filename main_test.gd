@@ -2,20 +2,7 @@ extends Control
 
 
 func _ready() -> void:
-	var table := DB.test_table
-	var entries := table.get_all()
-	for entry in entries:
-		print(entry)
-	
-	print("-------")
-	
-	print(table.create_select_query().select_columns([table.number]).get_as_raw_result())
-	
-	print("-------")
-	
-	entries = table.get_all()
-	for entry in entries:
-		print(entry)
+	pass
 
 
 func read_all_from_test_table() -> void:

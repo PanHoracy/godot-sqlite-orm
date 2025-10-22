@@ -6,7 +6,7 @@ var _name: String = ""
 
 func _init() -> void:
 	for column in _get_all_columns():
-		column._table = self
+		column._set_table(self)
 
 
 func _to_string() -> String:

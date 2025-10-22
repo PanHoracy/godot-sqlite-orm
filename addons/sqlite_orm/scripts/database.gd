@@ -5,11 +5,12 @@ class_name ORMDatabase extends Node
 
 const _UTILS := preload("res://addons/sqlite_orm/scripts/common/utils.gd")
 
-@onready var _tables: Array[ORMTable] = [test_table, product_table, missing_table, ]
+@onready var _tables: Array[ORMTable] = [test_table, product_table, producer_table, ]
 
 var _db: SQLite
 var _db_path: String
 var _verbosity_level: int
+var _are_foreign_keys_enabled: bool
 
 class EvaluationResult:
 	extends RefCounted
@@ -36,10 +37,13 @@ class EvaluationResult:
 			altered_columns.size()
 		]
 
+#TODO In order to enable foreign key initialization setup process for
+# tables needs to be reworked. Those should initialize in separate method
+# in safe order decided by the parser based on references inside those tables
 #region Tables
 var test_table := TestTableORM.new()
 var product_table := ProductTableORM.new()
-var missing_table := MissingTableORM.new()
+var producer_table := ProducerTableORM.new()
 #endregion
 
 #region Exposed to users
@@ -145,7 +149,7 @@ func _ready() -> void:
 	_db = SQLite.new()
 	_db.path = _db_path
 	_db.verbosity_level = _verbosity_level
-	_db.foreign_keys = true
+	_db.foreign_keys = _are_foreign_keys_enabled
 	
 	var success := _db.open_db()
 	if not success:
@@ -264,6 +268,7 @@ func _exit_tree() -> void:
 func _load_settings() -> void:
 	_db_path = ProjectSettings.get_setting(_UTILS.DATABASE_PATH_SP)
 	_verbosity_level = ProjectSettings.get_setting(_UTILS.VERBOSITY_LEVEL_SP)
+	_are_foreign_keys_enabled = ProjectSettings.get_setting(_UTILS.ENABLE_FOREIGN_KEYS)
 
 
 func _run_query(query: String) -> bool:

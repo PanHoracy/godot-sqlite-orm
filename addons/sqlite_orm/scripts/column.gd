@@ -38,6 +38,10 @@ func get_name_with_table() -> String:
 	return "%s.%s" % [get_table().get_name(), name]
 
 
+func _set_table(table: ORMTable) -> void:
+	_table = table
+
+
 #region Condition helpers
 
 
