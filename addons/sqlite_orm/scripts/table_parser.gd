@@ -2,6 +2,7 @@
 class_name ORMTableParser extends RefCounted
 
 #TODO parser is not removing table from database autoload after its file is removed
+#TODO make so that fields in table entry classes have default values that match column default values
 
 const GEN_CLASSES_FOLDER_PATH: String = "res://addons/sqlite_orm/scripts/generated/"
 const TABLE_ENTRY_TEMPLATE_FILE_PATH: String = "res://addons/sqlite_orm/scripts/common/table_entry_template.txt"
@@ -146,11 +147,11 @@ static func _get_columns_from_table_definition_file(table_definition_file: FileA
 		var end := line.find(":") if line.contains(":") else line.find("=")
 		var var_name := line.substr(start, end-start).strip_edges()
 		
-		if line.contains("ORMIntColumn") or line.contains("ORMPkColumn"):
+		if line.contains("ORMIntColumnBuilder") or line.contains("ORMPrimaryKeyColumn"):
 			columns[var_name] = "int"
-		elif line.contains("ORMFloatColumn"):
+		elif line.contains("ORMFloatColumnBuilder"):
 			columns[var_name] = "float"
-		elif line.contains("ORMStringColumn"):
+		elif line.contains("ORMStringColumnBuilder"):
 			columns[var_name] = "String"
 	
 	return columns

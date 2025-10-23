@@ -1,5 +1,5 @@
 extends ORMIdTable
 
-var product_name := ORMStringColumn.new().set_not_null()
-var price := ORMFloatColumn.new()
+var product_name := ORMStringColumnBuilder.new().set_not_null().build()
+var price := ORMFloatColumnBuilder.new().build()
 #var producer_id := ORMForeignKeyColumn.new(DB.producer_table.id)

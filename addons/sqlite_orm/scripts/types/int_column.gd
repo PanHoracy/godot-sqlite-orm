@@ -1,28 +1,21 @@
 class_name ORMIntColumn extends ORMColumn
 
-var use_default: bool = false
-var default: int = 0
+var _use_default: bool = false
+var _default: int = 0
 
 
-func set_default(value: int) -> ORMIntColumn:
-	use_default = true
-	default = value
-	return self
-
-
-func set_not_null(value: bool = true) -> ORMIntColumn:
-	return super.set_not_null(value)
-
-
-func set_unique(value: bool = true) -> ORMIntColumn:
-	return super.set_unique(value)
+func _init(not_null: bool, unique: bool, use_default: bool, default: int = 0) -> void:
+	_not_null = not_null
+	_unique = unique
+	_use_default = use_default
+	_default = default
 
 
 func get_column_dict() -> Dictionary:
 	var current := super.get_column_dict()
 	
 	current["data_type"] = "int"
-	if use_default:
-		current["default"] = default
+	if _use_default:
+		current["default"] = _default
 	
 	return current

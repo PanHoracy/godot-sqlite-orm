@@ -1,33 +1,15 @@
 @abstract
 class_name ORMColumn extends RefCounted
 
-enum SQLTypes {
-	INTEGER,
-	REAL,
-	TEXT,
-	BLOB,
-	UNDEFINED
-}
-
 var name: String = ""
-var not_null: bool = false
-var unique: bool = false
+var _not_null: bool = false
+var _unique: bool = false
 
 var _table: ORMTable = null
 
 
-func set_not_null(value: bool = true) -> ORMColumn:
-	not_null = value
-	return self
-
-
-func set_unique(value: bool = true) -> ORMColumn:
-	unique = value
-	return self
-
-
 func get_column_dict() -> Dictionary:
-	return {"not_null": not_null, "unique": unique}
+	return {"not_null": _not_null, "unique": _unique}
 
 
 func get_table() -> ORMTable:

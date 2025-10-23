@@ -1,9 +1,9 @@
 class_name ORMForeignKeyColumn extends ORMIntColumn
 
-var _reference_id_column: ORMPkColumn
+var _reference_id_column: ORMPrimaryKeyColumn
 
 
-func _init(references: ORMPkColumn) -> void:
+func _init(references: ORMPrimaryKeyColumn) -> void:
 	_reference_id_column = references
 
 

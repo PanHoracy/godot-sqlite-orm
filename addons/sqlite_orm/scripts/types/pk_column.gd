@@ -1,8 +1,8 @@
-class_name ORMPkColumn extends ORMIntColumn
+class_name ORMPrimaryKeyColumn extends ORMIntColumn
 
 func _init() -> void:
-	not_null = true
-	unique = true
+	_not_null = true
+	_unique = true
 
 
 func get_column_dict() -> Dictionary:

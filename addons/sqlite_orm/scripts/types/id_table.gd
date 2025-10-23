@@ -1,6 +1,6 @@
 class_name ORMIdTable extends ORMTable
 
-var id := ORMPkColumn.new()
+var id := ORMPrimaryKeyColumn.new()
 
 
 func _init() -> void:
