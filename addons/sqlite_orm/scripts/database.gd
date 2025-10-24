@@ -3,9 +3,11 @@ class_name ORMDatabase extends Node
 
 ## Class that is used by main singleton of SQLite ORM plugin.
 
+signal tables_ready
+
 const _UTILS := preload("res://addons/sqlite_orm/scripts/common/utils.gd")
 
-@onready var _tables: Array[ORMTable] = [test_table, product_table, producer_table, ]
+@onready var _tables: Array[ORMTable] = [test_table, producer_table, ]
 
 var _db: SQLite
 var _db_path: String
@@ -41,10 +43,18 @@ class EvaluationResult:
 # tables needs to be reworked. Those should initialize in separate method
 # in safe order decided by the parser based on references inside those tables
 #region Tables
-var test_table := TestTableORM.new()
-var product_table := ProductTableORM.new()
-var producer_table := ProducerTableORM.new()
+var test_table: TestTableORM = TestTableORM.new()
+var product_table: ProductTableORM
+var product_review: ProductReviewORM
+var producer_table: ProducerTableORM = ProducerTableORM.new()
 #endregion
+
+func _initialize_fk_tables() -> void:
+	product_table = ProductTableORM.new()
+	_tables.append(product_table)
+	product_review = ProductReviewORM.new()
+	_tables.append(product_review)
+	tables_ready.emit()
 
 #region Exposed to users
 
@@ -155,6 +165,8 @@ func _ready() -> void:
 	if not success:
 		push_error("There was an error while opening the database")
 	
+	_initialize_fk_tables()
+	
 	var evaluation_result: EvaluationResult = _evaluate_database()
 	print(evaluation_result)
 	#TODO add more ways to handle cases of altered database
@@ -212,8 +224,13 @@ func _evaluate_database() -> EvaluationResult:
 				continue
 			
 			for property in table_dict[column_name]:
+				#TODO Need to add a way to confirm that fk is in table schema
+				# pragma table_info doesn't have such information
+				if property == "foreign_key":
+					continue
+				
 				if not database_table_dict[column_name].has(property):
-					push_error("Read table dictionary doesn't have property of %s" % property)
+					push_error("Read table (%s) dictionary doesn't have property of %s" % [table.get_name(), property])
 					continue
 				
 				#HACK all default values from get_table_schema are strings, but probably

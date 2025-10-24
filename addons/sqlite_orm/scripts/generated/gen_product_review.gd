@@ -1,10 +1,10 @@
-class_name ProductTableORM extends "res://common/scrpts/tables/product_table.gd"
+class_name ProductReviewORM extends "res://common/scrpts/tables/product_review.gd"
 
 #TODO Add entry value validation. That is, let entry pass value inside of it to
 # column class, for it to validate, if it's correct
 
 
-class ProductTableORMSelect:
+class ProductReviewORMSelect:
 	extends ORMSelect
 	
 	
@@ -12,19 +12,19 @@ class ProductTableORMSelect:
 		super._init(table)
 	
 	
-	func get_entries() -> Array[ProductTableORMEntry]:
+	func get_entries() -> Array[ProductReviewORMEntry]:
 		if not _columns_to_query.is_empty():
 			push_error("Cannot set custom select_columns while using get_entries() and get_first_entry(). Use get_as_raw_result() instead")
 			return []
 		
 		var raw_results := get_as_raw_result()
-		var entries: Array[ProductTableORMEntry] = []
+		var entries: Array[ProductReviewORMEntry] = []
 		for result in raw_results:
-			entries.push_back(ProductTableORMEntry.wrap_query_result(result))
+			entries.push_back(ProductReviewORMEntry.wrap_query_result(result))
 		return entries
 	
 	
-	func get_first_entry() -> ProductTableORMEntry:
+	func get_first_entry() -> ProductReviewORMEntry:
 		_limit = 1
 		var entries := get_entries()
 		
@@ -33,39 +33,39 @@ class ProductTableORMSelect:
 	
 	#region Recasting base methods
 	
-	func where(condition: ORMCondition) -> ProductTableORMSelect:
+	func where(condition: ORMCondition) -> ProductReviewORMSelect:
 		super.where(condition)
 		return self
 	
 	
-	func order_by_asc(column: ORMColumn) -> ProductTableORMSelect:
+	func order_by_asc(column: ORMColumn) -> ProductReviewORMSelect:
 		super.order_by_asc(column)
 		return self
 	
 	
-	func order_by_desc(column: ORMColumn) -> ProductTableORMSelect:
+	func order_by_desc(column: ORMColumn) -> ProductReviewORMSelect:
 		super.order_by_desc(column)
 		return self
 	
 	
-	func limit(amount: int, offset: int = 0) -> ProductTableORMSelect:
+	func limit(amount: int, offset: int = 0) -> ProductReviewORMSelect:
 		super.limit(amount, offset)
 		return self
 	
 	
-	func select_columns(columns: Array[ORMColumn]) -> ProductTableORMSelect:
+	func select_columns(columns: Array[ORMColumn]) -> ProductReviewORMSelect:
 		super.select_columns(columns)
 		return self
 	
 	
-	func distinct(value: bool = true) -> ProductTableORMSelect:
+	func distinct(value: bool = true) -> ProductReviewORMSelect:
 		super.distinct(value)
 		return self
 	
 	#endregion
 
 
-class ProductTableORMUpdate:
+class ProductReviewORMUpdate:
 	extends ORMUpdate
 	
 	
@@ -75,31 +75,31 @@ class ProductTableORMUpdate:
 	
 	#region Recasting base methods
 	
-	func set_updated_row(updated_row: ORMEntry) -> ProductTableORMUpdate:
+	func set_updated_row(updated_row: ORMEntry) -> ProductReviewORMUpdate:
 		super.set_updated_row(updated_row)
 		return self
 	
-	func where(condition: ORMCondition) -> ProductTableORMUpdate:
+	func where(condition: ORMCondition) -> ProductReviewORMUpdate:
 		super.where(condition)
 		return self
 	
 	
-	func order_by_asc(column: ORMColumn) -> ProductTableORMUpdate:
+	func order_by_asc(column: ORMColumn) -> ProductReviewORMUpdate:
 		super.order_by_asc(column)
 		return self
 	
 	
-	func order_by_desc(column: ORMColumn) -> ProductTableORMUpdate:
+	func order_by_desc(column: ORMColumn) -> ProductReviewORMUpdate:
 		super.order_by_desc(column)
 		return self
 	
 	
-	func limit(amount: int, offset: int = 0) -> ProductTableORMUpdate:
+	func limit(amount: int, offset: int = 0) -> ProductReviewORMUpdate:
 		super.limit(amount, offset)
 		return self
 	
 	
-	func select_columns(columns: Array[ORMColumn]) -> ProductTableORMUpdate:
+	func select_columns(columns: Array[ORMColumn]) -> ProductReviewORMUpdate:
 		super.select_columns(columns)
 		return self
 	
@@ -107,39 +107,39 @@ class ProductTableORMUpdate:
 
 
 func _init() -> void:
-	_name = "product_table"
+	_name = "product_review"
 	
-	product_name.name = 'product_name'
-	price.name = 'price'
-	producer_id.name = 'producer_id'
+	title.name = 'title'
+	content.name = 'content'
+	product_it.name = 'product_it'
 	id.name = 'id'
 	
 	
 	super._init()
 
 
-func create_select_query() -> ProductTableORMSelect:
-	return ProductTableORMSelect.new(self)
+func create_select_query() -> ProductReviewORMSelect:
+	return ProductReviewORMSelect.new(self)
 
 
-func create_update_query() -> ProductTableORMUpdate:
-	return ProductTableORMUpdate.new(self)
+func create_update_query() -> ProductReviewORMUpdate:
+	return ProductReviewORMUpdate.new(self)
 
 
 func create_delete_query() -> ORMDelete:
 	return ORMDelete.new(self)
 
 
-func put_entries_array_into_table(entries: Array[ProductTableORMEntry]) -> void:
-	DB._get_db().insert_rows(get_name(), entries.map(func(e: ProductTableORMEntry): return e.get_entry_dict()) as Array[Dictionary])
+func put_entries_array_into_table(entries: Array[ProductReviewORMEntry]) -> void:
+	DB._get_db().insert_rows(get_name(), entries.map(func(e: ProductReviewORMEntry): return e.get_entry_dict()) as Array[Dictionary])
 
 
-func put_entry_into_table(entry: ProductTableORMEntry) -> void:
+func put_entry_into_table(entry: ProductReviewORMEntry) -> void:
 	DB._get_db().insert_row(get_name(), entry.get_entry_dict())
 
 
-func get_all() -> Array[ProductTableORMEntry]:
-	var result: Array[ProductTableORMEntry] = []
+func get_all() -> Array[ProductReviewORMEntry]:
+	var result: Array[ProductReviewORMEntry] = []
 	
 	var query := "SELECT * FROM %s" % get_name()
 	var query_result: Array[Dictionary] = DB._run_query_and_get_result_array(query)
@@ -152,12 +152,12 @@ func get_all() -> Array[ProductTableORMEntry]:
 		return []
 	
 	for result_dict in query_result:
-		result.push_back(ProductTableORMEntry.wrap_query_result(result_dict))
+		result.push_back(ProductReviewORMEntry.wrap_query_result(result_dict))
 	
 	return result
 
 
-func get_by_id(id: int) -> ProductTableORMEntry:
+func get_by_id(id: int) -> ProductReviewORMEntry:
 	var query := "SELECT * FROM %s WHERE id=%s" % [get_name(), id]
 	var query_result: Array[Dictionary] = DB._run_query_and_get_result_array(query)
 	
@@ -172,10 +172,10 @@ func get_by_id(id: int) -> ProductTableORMEntry:
 	if query_result.size() > 1:
 		push_warning("Get more then one result from get by id. Returning first result")
 	
-	return ProductTableORMEntry.wrap_query_result(query_result[0])
+	return ProductReviewORMEntry.wrap_query_result(query_result[0])
 
 
-func update_by_id(id: int, updated_row: ProductTableORMEntry) -> bool:
+func update_by_id(id: int, updated_row: ProductReviewORMEntry) -> bool:
 	if updated_row == null:
 		push_error("Cannot run update query when updated row is null")
 		return false
@@ -193,4 +193,4 @@ func delete_by_id(id: int) -> bool:
 
 
 func _get_all_columns() -> Array[ORMColumn]:
-	return [product_name, price, producer_id, id, ]
+	return [title, content, product_it, id, ]

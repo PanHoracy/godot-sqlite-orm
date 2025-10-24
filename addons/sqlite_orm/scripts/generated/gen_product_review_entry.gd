@@ -1,18 +1,18 @@
-class_name ProductTableORMEntry extends ORMEntry
+class_name ProductReviewORMEntry extends ORMEntry
 
-const EXCLUDED_PROPERTIES: Array[String] = ["RefCounted", "script", "Built-in script", "_parent_table", "gen_product_table_entry.gd", "_fields", "orm_entry.gd"]
+const EXCLUDED_PROPERTIES: Array[String] = ["RefCounted", "script", "Built-in script", "_parent_table", "gen_product_review_entry.gd", "_fields", "orm_entry.gd"]
 
-var product_name: String
-var price: float
-var producer_id: int
+var title: String
+var content: String
+var product_it: int
 var id: int
 
 
-static var _fields: Array[String] = ["product_name", "price", "producer_id", "id"]
+static var _fields: Array[String] = ["title", "content", "product_it", "id"]
 
 
-static func wrap_query_result(query_result: Dictionary) -> ProductTableORMEntry:
-	var entry := ProductTableORMEntry.new()
+static func wrap_query_result(query_result: Dictionary) -> ProductReviewORMEntry:
+	var entry := ProductReviewORMEntry.new()
 	
 	for field in _fields:
 		assert(query_result.has(field), "Invalid query result for that wrapper")
@@ -42,7 +42,7 @@ func get_entry_dict() -> Dictionary:
 
 
 func _to_string() -> String:
-	var message := "<ProductTableEntry: "
+	var message := "<ProductReviewEntry: "
 	for field in _fields:
 		message += "%s(%s), " % [field, get(field)]
 	message = message.erase(message.length()-2, 2)

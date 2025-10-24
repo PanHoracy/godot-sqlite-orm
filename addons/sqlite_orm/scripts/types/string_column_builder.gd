@@ -6,7 +6,7 @@ var _default: String = ""
 
 func set_default(value: String) -> ORMStringColumnBuilder:
 	_use_default = true
-	_default = value
+	_default = "'%s'" % value
 	return self
 
 

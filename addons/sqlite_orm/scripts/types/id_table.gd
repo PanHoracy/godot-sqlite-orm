@@ -5,6 +5,8 @@ var id := ORMPrimaryKeyColumn.new()
 
 func _init() -> void:
 	id.name = "id"
+	
+	super._init()
 
 
 func _get_all_columns() -> Array[ORMColumn]:

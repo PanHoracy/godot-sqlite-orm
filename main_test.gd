@@ -2,7 +2,7 @@ extends Control
 
 
 func _ready() -> void:
-	read_all_from_test_table()
+	pass
 
 
 func read_all_from_test_table() -> void:
