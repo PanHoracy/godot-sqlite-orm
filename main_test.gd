@@ -2,7 +2,20 @@ extends Control
 
 
 func _ready() -> void:
-	pass
+	var result := ORMSelect.new()\
+		.select(
+			DB.producer_table.producer_name,
+			DB.product_table.product_name,
+			DB.product_review.title,
+			DB.product_review.content
+			)\
+		.from(DB.producer_table)\
+		.inner_join(DB.product_table, DB.producer_table.id.equal(DB.product_table.producer_id))\
+		.full_outer_join(DB.product_review, DB.product_table.id.equal(DB.product_review.product_id))\
+		.get_as_raw_result()
+	
+	for entry in result:
+		print(entry)
 
 
 func read_all_from_test_table() -> void:
@@ -15,30 +28,6 @@ func read_all_from_product() -> void:
 		print(entry)
 
 
-func insert_things_to_product() -> void:
-	var entry: ProductTableORMEntry
-	
-	entry = ProductTableORMEntry.new()
-	entry.price = 50.0
-	entry.product_name = "Game"
-	DB.product.put_entry_into_table(entry)
-	
-	entry = ProductTableORMEntry.new()
-	entry.price = 700.0
-	entry.product_name = "Phone"
-	DB.product.put_entry_into_table(entry)
-	
-	entry = ProductTableORMEntry.new()
-	entry.price = 2.0
-	entry.product_name = "Bread"
-	DB.product.put_entry_into_table(entry)
-	
-	entry = ProductTableORMEntry.new()
-	entry.price = 15.0
-	entry.product_name = "Skin"
-	DB.product.put_entry_into_table(entry)
-
-
 func insert_things_to_test_table() -> void:
 	var test_entry := TestTableORMEntry.new()
 	var entries: Array[TestTableORMEntry] = []
@@ -46,7 +35,7 @@ func insert_things_to_test_table() -> void:
 		var entry := TestTableORMEntry.new()
 		entry.number = i+1
 		entry.text = "This is %s entry of array add" % i
-		entry.real = randf_range(0.0, 5.0)
+		entry.real = snappedf(randf_range(0.0, 5.0), 0.1)
 		entries.push_back(entry)
 	
 	test_entry.number = 11
@@ -55,6 +44,131 @@ func insert_things_to_test_table() -> void:
 	
 	DB.test_table.put_entry_into_table(test_entry)
 	DB.test_table.put_entries_array_into_table(entries)
+
+
+func insert_things_to_leaderboard() -> void:
+	var players: Array[String] = ["SuperDude", "GreatPlayer", "ItsMe", "Karl"]
+	
+	for player in players:
+		for i in randi_range(3, 7):
+			var entry := LeaderboardORMEntry.new()
+			entry.player_name = player
+			entry.score = randi_range(1, 100)
+			DB.leaderboard.put_entry_into_table(entry)
+
+
+func insert_things_to_products() -> void:
+	var producer_entry := ProducerTableORMEntry.new()
+	producer_entry.producer_name = "MSI"
+	DB.producer_table.put_entry_into_table(producer_entry)
+	
+	producer_entry = ProducerTableORMEntry.new()
+	producer_entry.producer_name = "Lenovo"
+	DB.producer_table.put_entry_into_table(producer_entry)
+	
+	producer_entry = ProducerTableORMEntry.new()
+	producer_entry.producer_name = "Dell"
+	DB.producer_table.put_entry_into_table(producer_entry)
+	
+	producer_entry = ProducerTableORMEntry.new()
+	producer_entry.producer_name = "Asus"
+	DB.producer_table.put_entry_into_table(producer_entry)
+	
+	var product_entry := ProductTableORMEntry.new()
+	product_entry.product_name = "Alpha 17"
+	product_entry.price = 7_400
+	product_entry.producer_id = 1
+	DB.product_table.put_entry_into_table(product_entry)
+	
+	product_entry = ProductTableORMEntry.new()
+	product_entry.product_name = "Leopard 17"
+	product_entry.price = 5_500
+	product_entry.producer_id = 1
+	DB.product_table.put_entry_into_table(product_entry)
+	
+	product_entry = ProductTableORMEntry.new()
+	product_entry.product_name = "Katana 15"
+	product_entry.price = 8_500
+	product_entry.producer_id = 1
+	DB.product_table.put_entry_into_table(product_entry)
+	
+	product_entry = ProductTableORMEntry.new()
+	product_entry.product_name = "Legion 5i"
+	product_entry.price = 6_000
+	product_entry.producer_id = 2
+	DB.product_table.put_entry_into_table(product_entry)
+	
+	product_entry = ProductTableORMEntry.new()
+	product_entry.product_name = "Ideapad 320"
+	product_entry.price = 2_500
+	product_entry.producer_id = 2
+	DB.product_table.put_entry_into_table(product_entry)
+	
+	product_entry = ProductTableORMEntry.new()
+	product_entry.product_name = "Legion 7"
+	product_entry.price = 8_000
+	product_entry.producer_id = 2
+	DB.product_table.put_entry_into_table(product_entry)
+	
+	product_entry = ProductTableORMEntry.new()
+	product_entry.product_name = "Yoga 5"
+	product_entry.price = 6_400
+	product_entry.producer_id = 2
+	DB.product_table.put_entry_into_table(product_entry)
+	
+	product_entry = ProductTableORMEntry.new()
+	product_entry.product_name = "Alienware 17"
+	product_entry.price = 9_000
+	product_entry.producer_id = 3
+	DB.product_table.put_entry_into_table(product_entry)
+	
+	product_entry = ProductTableORMEntry.new()
+	product_entry.product_name = "TUF 16"
+	product_entry.price = 5_750
+	product_entry.producer_id = 4
+	DB.product_table.put_entry_into_table(product_entry)
+	
+	product_entry = ProductTableORMEntry.new()
+	product_entry.product_name = "ROG Strix G16"
+	product_entry.price = 9_150
+	product_entry.producer_id = 4
+	DB.product_table.put_entry_into_table(product_entry)
+	
+	product_entry = ProductTableORMEntry.new()
+	product_entry.product_name = "ROG Strix G18"
+	product_entry.price = 11_250
+	product_entry.producer_id = 4
+	DB.product_table.put_entry_into_table(product_entry)
+	
+	var review_entry := ProductReviewORMEntry.new()
+	review_entry.title = "Excellent performance"
+	review_entry.content = "Great laptop"
+	review_entry.product_id = 1
+	DB.product_review.put_entry_into_table(review_entry)
+	
+	review_entry = ProductReviewORMEntry.new()
+	review_entry.title = "Great price"
+	review_entry.content = "Astonishing price for this class of hardware"
+	review_entry.product_id = 1
+	DB.product_review.put_entry_into_table(review_entry)
+	
+	review_entry = ProductReviewORMEntry.new()
+	review_entry.title = "Incredible"
+	review_entry.content = "Great performance"
+	review_entry.product_id = 2
+	DB.product_review.put_entry_into_table(review_entry)
+	
+	review_entry = ProductReviewORMEntry.new()
+	review_entry.title = "Very affordable"
+	review_entry.content = "Great price"
+	review_entry.product_id = 5
+	DB.product_review.put_entry_into_table(review_entry)
+	
+	review_entry = ProductReviewORMEntry.new()
+	review_entry.title = "My best buy yet"
+	review_entry.content = "Nothing comes even close"
+	review_entry.product_id = 10
+	DB.product_review.put_entry_into_table(review_entry)
 
 
 func advanced_update_text() -> void:

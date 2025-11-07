@@ -7,16 +7,26 @@ class_name ProducerTableORM extends "res://common/scrpts/tables/producer_table.g
 class ProducerTableORMSelect:
 	extends ORMSelect
 	
+	var _parent_table: ProducerTableORM
 	
-	func _init(table: ORMTable) -> void:
-		super._init(table)
+	
+	func _init(parent_table: ProducerTableORM) -> void:
+		_parent_table = parent_table
+	
+	
+	func _get_from_table() -> String:
+		return _parent_table.get_name()
+	
+	
+	func _get_selected() -> String:
+		return ", ".join(_parent_table.get_all_columns().map(func(c: ORMColumn): return c.get_name_with_table()))
+	
+	
+	func _get_join_clauses() -> String:
+		return ""
 	
 	
 	func get_entries() -> Array[ProducerTableORMEntry]:
-		if not _columns_to_query.is_empty():
-			push_error("Cannot set custom select_columns while using get_entries() and get_first_entry(). Use get_as_raw_result() instead")
-			return []
-		
 		var raw_results := get_as_raw_result()
 		var entries: Array[ProducerTableORMEntry] = []
 		for result in raw_results:
@@ -32,6 +42,21 @@ class ProducerTableORMSelect:
 	
 	
 	#region Recasting base methods
+	
+	func group_by(...columns: Array) -> ProducerTableORMSelect:
+		super.group_by(columns)
+		return self
+	
+	
+	func having(condition: ORMCondition) -> ProducerTableORMSelect:
+		super.having(condition)
+		return self
+	
+	
+	func distinct(value: bool = true) -> ProducerTableORMSelect:
+		super.distinct(value)
+		return self
+	
 	
 	func where(condition: ORMCondition) -> ProducerTableORMSelect:
 		super.where(condition)
@@ -52,57 +77,6 @@ class ProducerTableORMSelect:
 		super.limit(amount, offset)
 		return self
 	
-	
-	func select_columns(columns: Array[ORMColumn]) -> ProducerTableORMSelect:
-		super.select_columns(columns)
-		return self
-	
-	
-	func distinct(value: bool = true) -> ProducerTableORMSelect:
-		super.distinct(value)
-		return self
-	
-	#endregion
-
-
-class ProducerTableORMUpdate:
-	extends ORMUpdate
-	
-	
-	func _init(table: ORMTable) -> void:
-		super._init(table)
-	
-	
-	#region Recasting base methods
-	
-	func set_updated_row(updated_row: ORMEntry) -> ProducerTableORMUpdate:
-		super.set_updated_row(updated_row)
-		return self
-	
-	func where(condition: ORMCondition) -> ProducerTableORMUpdate:
-		super.where(condition)
-		return self
-	
-	
-	func order_by_asc(column: ORMColumn) -> ProducerTableORMUpdate:
-		super.order_by_asc(column)
-		return self
-	
-	
-	func order_by_desc(column: ORMColumn) -> ProducerTableORMUpdate:
-		super.order_by_desc(column)
-		return self
-	
-	
-	func limit(amount: int, offset: int = 0) -> ProducerTableORMUpdate:
-		super.limit(amount, offset)
-		return self
-	
-	
-	func select_columns(columns: Array[ORMColumn]) -> ProducerTableORMUpdate:
-		super.select_columns(columns)
-		return self
-	
 	#endregion
 
 
@@ -120,8 +94,8 @@ func create_select_query() -> ProducerTableORMSelect:
 	return ProducerTableORMSelect.new(self)
 
 
-func create_update_query() -> ProducerTableORMUpdate:
-	return ProducerTableORMUpdate.new(self)
+func create_update_query() -> ORMUpdate:
+	return ORMUpdate.new(self)
 
 
 func create_delete_query() -> ORMDelete:
@@ -190,5 +164,5 @@ func delete_by_id(id: int) -> bool:
 
 
 
-func _get_all_columns() -> Array[ORMColumn]:
+func get_all_columns() -> Array[ORMColumn]:
 	return [producer_name, id, ]

@@ -1,15 +1,27 @@
-class_name ORMUpdate extends ORMQueryWithLimitOrderSelect
+class_name ORMUpdate extends ORMQuery
 
-var _updated_row: ORMEntry = null
+var _table: ORMTable = null
+var _values_to_set: Dictionary[String, String] = {}
 
 
 func _init(table: ORMTable) -> void:
-	super._init(table)
+	_table = table
 
 
-func set_updated_row(updated_row: ORMEntry) -> ORMUpdate:
-	_updated_row = updated_row
-	return self
+func get_query_string() -> String:
+	var pattern := "UPDATE %s SET %s"
+	var table_name := _table.get_name() if is_instance_valid(_table) else "UNKNOWN"
+	
+	var set_string := ""
+	for column_name in _values_to_set:
+		set_string += column_name + " = " + _values_to_set[column_name] + ", "
+	set_string = set_string.substr(0, set_string.length()-2)
+	
+	var query := pattern % [table_name, set_string]
+	query = _add_where_to_query_string(query)
+	query = _add_order_and_limit_to_query_string(query)
+	
+	return query
 
 
 func update() -> bool:
@@ -17,34 +29,35 @@ func update() -> bool:
 		push_error("Cannot run query without table provided. Aborting query")
 		return false
 	
-	if _updated_row == null:
-			push_error("Cannot run update query without updated row")
-			return false
+	if _values_to_set.is_empty():
+		push_error("Cannot run query with no value to set. Aborting query")
+		return false
 	
-	var pattern := "UPDATE %s SET %s"
-	
-	var updated_row_dict: Dictionary = _updated_row.get_entry_dict()
-	var columns_to_update_string := ""
-	var column_array: Array[String] = Array(updated_row_dict.keys(), TYPE_STRING, "", null)
-	if not _columns_to_query.is_empty(): 
-		column_array = []
-		for column_name_with_table in _columns_to_query:
-			column_array.push_back(column_name_with_table.split(".")[1])
-	
-	for column_name in column_array:
-		columns_to_update_string += column_name + " = " + str(updated_row_dict[column_name]) + ", "
-	columns_to_update_string = columns_to_update_string.substr(0, len(columns_to_update_string)-2)
-	
-	var query := pattern % [_table.get_name(), columns_to_update_string]
-	if _condition != null:
-		query += "\nWHERE %s" % _condition.get_condition()
-	if not _ordering.is_empty():
-		query += "\nORDER BY %s" % _get_ordering()
-	if _limit > 0:
-		query += "\nLIMIT %s OFFSET %s" % [_limit, _limit_offset]
+	var query := get_query_string()
 	
 	print("Entered query:\n%s" % query)
 	return DB._run_query(query)
+
+
+func set_value(column: ORMColumn, value: Variant) -> ORMUpdate:
+	if column.get_table() != _table:
+		push_error("You can update only columns from table passed to init. This set will be aborted")
+		return self
+	
+	#OPTION Could add here a check that would prevent user form entering invalid data
+	_values_to_set[column.name] = str(value)
+	
+	return self
+
+
+func set_entry(updated_row: ORMEntry) -> ORMUpdate:
+	#OPTION Add check if entry is from correct table
+	
+	var entry_dict: Dictionary = updated_row.get_entry_dict()
+	for column_name in entry_dict.keys():
+		_values_to_set[column_name] = str(entry_dict[column_name])
+	
+	return self
 
 
 #region Recasting base methods
@@ -66,11 +79,6 @@ func order_by_desc(column: ORMColumn) -> ORMUpdate:
 
 func limit(amount: int, offset: int = 0) -> ORMUpdate:
 	super.limit(amount, offset)
-	return self
-
-
-func select_columns(columns: Array[ORMColumn]) -> ORMUpdate:
-	super.select_columns(columns)
 	return self
 
 #endregion

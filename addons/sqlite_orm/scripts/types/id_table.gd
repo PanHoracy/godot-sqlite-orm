@@ -9,9 +9,9 @@ func _init() -> void:
 	super._init()
 
 
-func _get_all_columns() -> Array[ORMColumn]:
+func get_all_columns() -> Array[ORMColumn]:
 	var result: Array[ORMColumn] = [id]
 	
-	result.append_array(super._get_all_columns())
+	result.append_array(super.get_all_columns())
 	
 	return result 

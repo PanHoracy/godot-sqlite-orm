@@ -7,7 +7,7 @@ signal tables_ready
 
 const _UTILS := preload("res://addons/sqlite_orm/scripts/common/utils.gd")
 
-@onready var _tables: Array[ORMTable] = [test_table, producer_table, ]
+@onready var _tables: Array[ORMTable] = [test_table, producer_table, leaderboard, ]
 
 var _db: SQLite
 var _db_path: String
@@ -39,14 +39,12 @@ class EvaluationResult:
 			altered_columns.size()
 		]
 
-#TODO In order to enable foreign key initialization setup process for
-# tables needs to be reworked. Those should initialize in separate method
-# in safe order decided by the parser based on references inside those tables
 #region Tables
 var test_table: TestTableORM = TestTableORM.new()
 var product_table: ProductTableORM
 var product_review: ProductReviewORM
 var producer_table: ProducerTableORM = ProducerTableORM.new()
+var leaderboard: LeaderboardORM = LeaderboardORM.new()
 #endregion
 
 func _initialize_fk_tables() -> void:
@@ -295,3 +293,31 @@ func _run_query(query: String) -> bool:
 		push_error("Error while running query (%s): %s" % [query, _db.error_message])
 	
 	return success
+
+
+#region Select Helper methods
+
+func AS(column: Variant, alias: String) -> ORMSelectAs:
+	return ORMSelectAs.new(column, alias)
+
+
+func AVG(column: Variant) -> ORMSelectAvg:
+	return ORMSelectAvg.new(column)
+
+
+func COUNT(column: Variant) -> ORMSelectCount:
+	return ORMSelectCount.new(column)
+
+
+func MAX(column: Variant) -> ORMSelectMax:
+	return ORMSelectMax.new(column)
+
+
+func MIN(column: Variant) -> ORMSelectMin:
+	return ORMSelectMin.new(column)
+
+
+func SUM(column: Variant) -> ORMSelectSum:
+	return ORMSelectSum.new(column)
+
+#endregion

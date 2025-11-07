@@ -1,8 +1,24 @@
-class_name ORMDelete extends ORMQueryWithLimitOrder
+class_name ORMDelete extends ORMQuery
+
+var _table: ORMTable = null
 
 
 func _init(table: ORMTable) -> void:
-	super._init(table)
+	_table = table
+
+
+func get_query_string() -> String:
+	var query := "DELETE FROM %s"
+	
+	if is_instance_valid(_table):
+		query = query % _table.get_name()
+	else:
+		query = query % "UNKNOWN"
+	
+	query = _add_where_to_query_string(query)
+	query = _add_order_and_limit_to_query_string(query)
+	
+	return query
 
 
 func delete() -> bool:
@@ -10,14 +26,7 @@ func delete() -> bool:
 		push_error("Cannot run query without table provided. Aborting query")
 		return false
 	
-	var query := "DELETE FROM %s" % _table.get_name()
-	
-	if _condition != null:
-		query += "\nWHERE %s" % _condition.get_condition()
-	if not _ordering.is_empty():
-		query += "\nORDER BY %s" % _get_ordering()
-	if _limit > 0:
-		query += "\nLIMIT %s OFFSET %s" % [_limit, _limit_offset]
+	var query := get_query_string()
 	
 	print("Entered query:\n%s" % query)
 	return DB._run_query(query)
@@ -26,7 +35,8 @@ func delete() -> bool:
 #region Recasting base methods
 
 func where(condition: ORMCondition) -> ORMDelete:
-	return super.where(condition) as ORMDelete
+	super.where(condition)
+	return self
 
 
 func order_by_asc(column: ORMColumn) -> ORMDelete:

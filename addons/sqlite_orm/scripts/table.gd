@@ -5,7 +5,7 @@ var _name: String = ""
 
 
 func _init() -> void:
-	for column in _get_all_columns():
+	for column in get_all_columns():
 		column._set_table(self)
 
 
@@ -20,7 +20,7 @@ func get_name() -> String:
 func get_table_dict() -> Dictionary:
 	var dict := {}
 	
-	for column in _get_all_columns():
+	for column in get_all_columns():
 		dict[column.name] = column.get_column_dict()
 	
 	return dict
@@ -34,5 +34,5 @@ func get_row_count() -> int:
 	return result[0]["RES"]
 
 
-func _get_all_columns() -> Array[ORMColumn]:
+func get_all_columns() -> Array[ORMColumn]:
 	return []

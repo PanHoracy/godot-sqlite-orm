@@ -1,16 +1,16 @@
-class_name ProductTableORM extends "res://common/scrpts/tables/product_table.gd"
+class_name LeaderboardORM extends "res://common/scrpts/tables/leaderboard.gd"
 
 #TODO Add entry value validation. That is, let entry pass value inside of it to
 # column class, for it to validate, if it's correct
 
 
-class ProductTableORMSelect:
+class LeaderboardORMSelect:
 	extends ORMSelect
 	
-	var _parent_table: ProductTableORM
+	var _parent_table: LeaderboardORM
 	
 	
-	func _init(parent_table: ProductTableORM) -> void:
+	func _init(parent_table: LeaderboardORM) -> void:
 		_parent_table = parent_table
 	
 	
@@ -26,15 +26,15 @@ class ProductTableORMSelect:
 		return ""
 	
 	
-	func get_entries() -> Array[ProductTableORMEntry]:
+	func get_entries() -> Array[LeaderboardORMEntry]:
 		var raw_results := get_as_raw_result()
-		var entries: Array[ProductTableORMEntry] = []
+		var entries: Array[LeaderboardORMEntry] = []
 		for result in raw_results:
-			entries.push_back(ProductTableORMEntry.wrap_query_result(result))
+			entries.push_back(LeaderboardORMEntry.wrap_query_result(result))
 		return entries
 	
 	
-	func get_first_entry() -> ProductTableORMEntry:
+	func get_first_entry() -> LeaderboardORMEntry:
 		_limit = 1
 		var entries := get_entries()
 		
@@ -43,37 +43,37 @@ class ProductTableORMSelect:
 	
 	#region Recasting base methods
 	
-	func group_by(...columns: Array) -> ProductTableORMSelect:
+	func group_by(...columns: Array) -> LeaderboardORMSelect:
 		super.group_by(columns)
 		return self
 	
 	
-	func having(condition: ORMCondition) -> ProductTableORMSelect:
+	func having(condition: ORMCondition) -> LeaderboardORMSelect:
 		super.having(condition)
 		return self
 	
 	
-	func distinct(value: bool = true) -> ProductTableORMSelect:
+	func distinct(value: bool = true) -> LeaderboardORMSelect:
 		super.distinct(value)
 		return self
 	
 	
-	func where(condition: ORMCondition) -> ProductTableORMSelect:
+	func where(condition: ORMCondition) -> LeaderboardORMSelect:
 		super.where(condition)
 		return self
 	
 	
-	func order_by_asc(column: ORMColumn) -> ProductTableORMSelect:
+	func order_by_asc(column: ORMColumn) -> LeaderboardORMSelect:
 		super.order_by_asc(column)
 		return self
 	
 	
-	func order_by_desc(column: ORMColumn) -> ProductTableORMSelect:
+	func order_by_desc(column: ORMColumn) -> LeaderboardORMSelect:
 		super.order_by_desc(column)
 		return self
 	
 	
-	func limit(amount: int, offset: int = 0) -> ProductTableORMSelect:
+	func limit(amount: int, offset: int = 0) -> LeaderboardORMSelect:
 		super.limit(amount, offset)
 		return self
 	
@@ -81,19 +81,18 @@ class ProductTableORMSelect:
 
 
 func _init() -> void:
-	_name = "product_table"
+	_name = "leaderboard"
 	
-	product_name.name = 'product_name'
-	price.name = 'price'
-	producer_id.name = 'producer_id'
+	player_name.name = 'player_name'
+	score.name = 'score'
 	id.name = 'id'
 	
 	
 	super._init()
 
 
-func create_select_query() -> ProductTableORMSelect:
-	return ProductTableORMSelect.new(self)
+func create_select_query() -> LeaderboardORMSelect:
+	return LeaderboardORMSelect.new(self)
 
 
 func create_update_query() -> ORMUpdate:
@@ -104,16 +103,16 @@ func create_delete_query() -> ORMDelete:
 	return ORMDelete.new(self)
 
 
-func put_entries_array_into_table(entries: Array[ProductTableORMEntry]) -> void:
-	DB._get_db().insert_rows(get_name(), entries.map(func(e: ProductTableORMEntry): return e.get_entry_dict()) as Array[Dictionary])
+func put_entries_array_into_table(entries: Array[LeaderboardORMEntry]) -> void:
+	DB._get_db().insert_rows(get_name(), entries.map(func(e: LeaderboardORMEntry): return e.get_entry_dict()) as Array[Dictionary])
 
 
-func put_entry_into_table(entry: ProductTableORMEntry) -> void:
+func put_entry_into_table(entry: LeaderboardORMEntry) -> void:
 	DB._get_db().insert_row(get_name(), entry.get_entry_dict())
 
 
-func get_all() -> Array[ProductTableORMEntry]:
-	var result: Array[ProductTableORMEntry] = []
+func get_all() -> Array[LeaderboardORMEntry]:
+	var result: Array[LeaderboardORMEntry] = []
 	
 	var query := "SELECT * FROM %s" % get_name()
 	var query_result: Array[Dictionary] = DB._run_query_and_get_result_array(query)
@@ -126,12 +125,12 @@ func get_all() -> Array[ProductTableORMEntry]:
 		return []
 	
 	for result_dict in query_result:
-		result.push_back(ProductTableORMEntry.wrap_query_result(result_dict))
+		result.push_back(LeaderboardORMEntry.wrap_query_result(result_dict))
 	
 	return result
 
 
-func get_by_id(id: int) -> ProductTableORMEntry:
+func get_by_id(id: int) -> LeaderboardORMEntry:
 	var query := "SELECT * FROM %s WHERE id=%s" % [get_name(), id]
 	var query_result: Array[Dictionary] = DB._run_query_and_get_result_array(query)
 	
@@ -146,10 +145,10 @@ func get_by_id(id: int) -> ProductTableORMEntry:
 	if query_result.size() > 1:
 		push_warning("Get more then one result from get by id. Returning first result")
 	
-	return ProductTableORMEntry.wrap_query_result(query_result[0])
+	return LeaderboardORMEntry.wrap_query_result(query_result[0])
 
 
-func update_by_id(id: int, updated_row: ProductTableORMEntry) -> bool:
+func update_by_id(id: int, updated_row: LeaderboardORMEntry) -> bool:
 	if updated_row == null:
 		push_error("Cannot run update query when updated row is null")
 		return false
@@ -167,4 +166,4 @@ func delete_by_id(id: int) -> bool:
 
 
 func get_all_columns() -> Array[ORMColumn]:
-	return [product_name, price, producer_id, id, ]
+	return [player_name, score, id, ]

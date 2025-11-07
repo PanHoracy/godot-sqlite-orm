@@ -7,16 +7,26 @@ class_name TestTableORM extends "res://common/scrpts/tables/test_table.gd"
 class TestTableORMSelect:
 	extends ORMSelect
 	
+	var _parent_table: TestTableORM
 	
-	func _init(table: ORMTable) -> void:
-		super._init(table)
+	
+	func _init(parent_table: TestTableORM) -> void:
+		_parent_table = parent_table
+	
+	
+	func _get_from_table() -> String:
+		return _parent_table.get_name()
+	
+	
+	func _get_selected() -> String:
+		return ", ".join(_parent_table.get_all_columns().map(func(c: ORMColumn): return c.get_name_with_table()))
+	
+	
+	func _get_join_clauses() -> String:
+		return ""
 	
 	
 	func get_entries() -> Array[TestTableORMEntry]:
-		if not _columns_to_query.is_empty():
-			push_error("Cannot set custom select_columns while using get_entries() and get_first_entry(). Use get_as_raw_result() instead")
-			return []
-		
 		var raw_results := get_as_raw_result()
 		var entries: Array[TestTableORMEntry] = []
 		for result in raw_results:
@@ -32,6 +42,21 @@ class TestTableORMSelect:
 	
 	
 	#region Recasting base methods
+	
+	func group_by(...columns: Array) -> TestTableORMSelect:
+		super.group_by(columns)
+		return self
+	
+	
+	func having(condition: ORMCondition) -> TestTableORMSelect:
+		super.having(condition)
+		return self
+	
+	
+	func distinct(value: bool = true) -> TestTableORMSelect:
+		super.distinct(value)
+		return self
+	
 	
 	func where(condition: ORMCondition) -> TestTableORMSelect:
 		super.where(condition)
@@ -52,57 +77,6 @@ class TestTableORMSelect:
 		super.limit(amount, offset)
 		return self
 	
-	
-	func select_columns(columns: Array[ORMColumn]) -> TestTableORMSelect:
-		super.select_columns(columns)
-		return self
-	
-	
-	func distinct(value: bool = true) -> TestTableORMSelect:
-		super.distinct(value)
-		return self
-	
-	#endregion
-
-
-class TestTableORMUpdate:
-	extends ORMUpdate
-	
-	
-	func _init(table: ORMTable) -> void:
-		super._init(table)
-	
-	
-	#region Recasting base methods
-	
-	func set_updated_row(updated_row: ORMEntry) -> TestTableORMUpdate:
-		super.set_updated_row(updated_row)
-		return self
-	
-	func where(condition: ORMCondition) -> TestTableORMUpdate:
-		super.where(condition)
-		return self
-	
-	
-	func order_by_asc(column: ORMColumn) -> TestTableORMUpdate:
-		super.order_by_asc(column)
-		return self
-	
-	
-	func order_by_desc(column: ORMColumn) -> TestTableORMUpdate:
-		super.order_by_desc(column)
-		return self
-	
-	
-	func limit(amount: int, offset: int = 0) -> TestTableORMUpdate:
-		super.limit(amount, offset)
-		return self
-	
-	
-	func select_columns(columns: Array[ORMColumn]) -> TestTableORMUpdate:
-		super.select_columns(columns)
-		return self
-	
 	#endregion
 
 
@@ -121,8 +95,8 @@ func create_select_query() -> TestTableORMSelect:
 	return TestTableORMSelect.new(self)
 
 
-func create_update_query() -> TestTableORMUpdate:
-	return TestTableORMUpdate.new(self)
+func create_update_query() -> ORMUpdate:
+	return ORMUpdate.new(self)
 
 
 func create_delete_query() -> ORMDelete:
@@ -159,5 +133,5 @@ func get_all() -> Array[TestTableORMEntry]:
 
 
 
-func _get_all_columns() -> Array[ORMColumn]:
+func get_all_columns() -> Array[ORMColumn]:
 	return [number, text, real, ]
