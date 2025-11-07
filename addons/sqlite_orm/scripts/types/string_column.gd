@@ -21,6 +21,18 @@ func get_column_dict() -> Dictionary:
 	return current
 
 
+func get_all_values(distinct: bool = false) -> Array[String]:
+	return Array(super.get_all_values(distinct), TYPE_STRING, "", null)
+
+
+func get_max(distinct: bool = false) -> String:
+	return str(super.get_max(distinct))
+
+
+func get_min(distinct: bool = false) -> String:
+	return str(super.get_min(distinct))
+
+
 #region Condition helpers
 
 func not_like(pattern: String) -> ORMCondition:

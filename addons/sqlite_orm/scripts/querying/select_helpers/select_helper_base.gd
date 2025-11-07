@@ -1,6 +1,9 @@
 @abstract
 class_name ORMSelectHelperBase extends ORMConditionElement
 
+#TODO Investigate how to implement this better (could be one class
+# instaed of that many)
+
 var _column: String
 var _from_table: String
 

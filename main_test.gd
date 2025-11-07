@@ -2,20 +2,9 @@ extends Control
 
 
 func _ready() -> void:
-	var result := ORMSelect.new()\
-		.select(
-			DB.producer_table.producer_name,
-			DB.product_table.product_name,
-			DB.product_review.title,
-			DB.product_review.content
-			)\
-		.from(DB.producer_table)\
-		.inner_join(DB.product_table, DB.producer_table.id.equal(DB.product_table.producer_id))\
-		.full_outer_join(DB.product_review, DB.product_table.id.equal(DB.product_review.product_id))\
-		.get_as_raw_result()
-	
-	for entry in result:
-		print(entry)
+	print("Number: ", DB.test_table.number.get_sum())
+	print("Text: ", DB.test_table.text.get_sum())
+	print("Real: ", DB.test_table.real.get_sum())
 
 
 func read_all_from_test_table() -> void:

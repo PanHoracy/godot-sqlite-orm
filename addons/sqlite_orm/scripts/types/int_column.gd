@@ -19,3 +19,19 @@ func get_column_dict() -> Dictionary:
 		current["default"] = _default
 	
 	return current
+
+
+func get_all_values(distinct: bool = false) -> Array[int]:
+	return Array(super.get_all_values(distinct), TYPE_INT, "", null)
+
+
+func get_max(distinct: bool = false) -> int:
+	return int(super.get_max(distinct))
+
+
+func get_min(distinct: bool = false) -> int:
+	return int(super.get_min(distinct))
+
+
+func get_sum(distinct: bool = false) -> int:
+	return int(super.get_sum(distinct))
