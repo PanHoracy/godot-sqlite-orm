@@ -99,7 +99,8 @@ func get_table_schema(table_name: String) -> Dictionary[String, Dictionary]:
 			"data_type": data_type,
 			"not_null": not_null,
 			"default": column_dict["dflt_value"],
-			"primary_key": primary_key
+			"primary_key": primary_key,
+			"foreign_key": null
 		}
 	
 	# Read information that is not availabe in pragma (unique, autoincrement)
@@ -137,6 +138,12 @@ func get_table_schema(table_name: String) -> Dictionary[String, Dictionary]:
 		var parts := text.split(" ")
 		if parts.size() >= 2:
 			result[parts[0]]["auto_increment"] = parts[1] == "AUTOINCREMENT"
+	
+	for fk_text in fk_constrains:
+		var parts := fk_text.split(" ")
+		var column_name := parts[2].replace("(", "").replace(")", "")
+		var references := parts[4].replace("(", ".").replace(")", "")
+		result[column_name]["foreign_key"] = references
 	
 	return result
 
@@ -198,12 +205,11 @@ func _ready() -> void:
 	if not evaluation_result.altered_columns.is_empty():
 		for table: ORMTable in evaluation_result.altered_columns.keys():
 			if not tables_to_recreate.has(table):
-				tables_to_recreate[table] = [evaluation_result.altered_columns[table]]
+				tables_to_recreate[table] = evaluation_result.altered_columns[table]
 			else:
 				tables_to_recreate[table].append_array(evaluation_result.altered_columns[table])
 	
 	for table: ORMTable in tables_to_recreate.keys():
-		print(tables_to_recreate[table])
 		_recreate_table_preserve_data(table, Array(tables_to_recreate[table], TYPE_STRING, "", null))
 
 
@@ -235,11 +241,6 @@ func _evaluate_database() -> EvaluationResult:
 				continue
 			
 			for property in table_dict[column_name]:
-				#TODO Need to add a way to confirm that fk is in table schema
-				# pragma table_info doesn't have such information
-				if property == "foreign_key":
-					continue
-				
 				if not database_table_dict[column_name].has(property):
 					push_error("Read table (%s) dictionary doesn't have property of %s" % [table.get_name(), property])
 					continue
