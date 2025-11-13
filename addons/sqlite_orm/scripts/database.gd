@@ -81,11 +81,16 @@ func get_table_schema(table_name: String) -> Dictionary[String, Dictionary]:
 	for column_dict in _db.query_result:
 		var column_name: String = column_dict["name"]
 		var data_type := ""
+		var default_value = column_dict["dflt_value"]
 		match column_dict["type"]:
 			"INTEGER":
 				data_type = "int"
+				if default_value != null:
+					default_value = int(default_value)
 			"REAL":
 				data_type = "real"
+				if default_value != null:
+					default_value = float(default_value)
 			"TEXT":
 				data_type = "text"
 			"BLOB":
@@ -98,7 +103,7 @@ func get_table_schema(table_name: String) -> Dictionary[String, Dictionary]:
 		result[column_name] = {
 			"data_type": data_type,
 			"not_null": not_null,
-			"default": column_dict["dflt_value"],
+			"default": default_value,
 			"primary_key": primary_key,
 			"foreign_key": null
 		}
@@ -245,10 +250,7 @@ func _evaluate_database() -> EvaluationResult:
 					push_error("Read table (%s) dictionary doesn't have property of %s" % [table.get_name(), property])
 					continue
 				
-				#HACK all default values from get_table_schema are strings, but probably
-				# should be casted to correct type. For now here I convert both to str
-				# until that is done
-				if not str(table_dict[column_name][property]) == str(database_table_dict[column_name][property]):
+				if not table_dict[column_name][property] == database_table_dict[column_name][property]:
 					altered_columns.append(column_name)
 					break
 			
