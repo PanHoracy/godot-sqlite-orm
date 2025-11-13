@@ -2,9 +2,7 @@ extends Control
 
 
 func _ready() -> void:
-	print("Number: ", DB.test_table.number.get_sum())
-	print("Text: ", DB.test_table.text.get_sum())
-	print("Real: ", DB.test_table.real.get_sum())
+	print(DB.leaderboard.get_all())
 
 
 func read_all_from_test_table() -> void:

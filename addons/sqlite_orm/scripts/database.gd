@@ -109,27 +109,40 @@ func get_table_schema(table_name: String) -> Dictionary[String, Dictionary]:
 	
 	# Extract information about columns, and split into dictionary, with column name
 	# as key
-	#FIXME Here if table was created in different method it might have different
-	# looking sql_text with will produce conflict. For example if database is backuped
-	# with SQLite Browser and then restored it will have quotes around column names
 	var sql_text: String = _db.query_result[0]["sql"]
 	var start: int = sql_text.find("(")+1
-	sql_text = sql_text.substr(start, sql_text.find(")")-start)
+	sql_text = sql_text.substr(start, sql_text.rfind(")")-start)
 	var columns_sql: Array[String] = Array(Array(sql_text.split(",")).map(func(s: String): return s.strip_edges()), TYPE_STRING, "", null)
 	var columns_sql_dict := {}
+	var pk_constrains: Array[String] = []
+	var fk_constrains: Array[String] = []
 	for text in columns_sql:
-		var column_name := text.substr(0, text.find(" "))
-		columns_sql_dict[column_name] = text.substr(text.find(" ")).strip_edges()
+		var text_formated := text.replace("\"", "")
+		text_formated = text_formated.replace("\t", " ")
+		if text_formated.begins_with("PRIMARY KEY"):
+			pk_constrains.push_back(text_formated)
+		elif text_formated.begins_with("FOREIGN KEY"):
+			fk_constrains.push_back(text_formated)
+		else:
+			var column_name := text_formated.substr(0, text_formated.find(" "))
+			columns_sql_dict[column_name] = text_formated.substr(text_formated.find(" ")).strip_edges()
 	
 	for column_name in result.keys():
 		result[column_name]["unique"] = columns_sql_dict[column_name].contains("UNIQUE")
 		result[column_name]["auto_increment"] = columns_sql_dict[column_name].contains("AUTOINCREMENT")
 	
+	for pk_text in pk_constrains:
+		start = pk_text.find("(")+1
+		var text := pk_text.substr(start, pk_text.rfind(")")-start)
+		var parts := text.split(" ")
+		if parts.size() >= 2:
+			result[parts[0]]["auto_increment"] = parts[1] == "AUTOINCREMENT"
+	
 	return result
 
 #endregion
 
-#region: Exposed to the rest of the plugin
+#region Exposed to the rest of the plugin
 
 ## Get direct access to SQLite Object. Should only be used by plugin, but 
 ## if you know what you are doing, you are welcome to use it as well I guess
