@@ -23,5 +23,12 @@ func set_unique(value: bool = true) -> ORMForeignKeyColumnBuilder:
 	return super.set_unique(value)
 
 
+func set_old_names(...values: Array) -> ORMForeignKeyColumnBuilder:
+	super.set_old_names(values)
+	return self
+
+
 func build() -> ORMForeignKeyColumn:
-	return ORMForeignKeyColumn.new(_reference, _not_null, _unique, _use_default, _default)
+	var result := ORMForeignKeyColumn.new(_reference, _not_null, _unique, _use_default, _default)
+	result._old_names = _old_names
+	return result

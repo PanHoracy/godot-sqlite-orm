@@ -1,11 +1,6 @@
 @abstract
 class_name ORMQuery extends RefCounted
 
-#TODO Recreate quering system. Decouple if from indivitual table
-# this can be done in some Query decendant, that Update and Delete
-# will inherit. At the same time make it possible to query with
-# joins.
-
 enum Orders {
 	ASC,
 	DESC

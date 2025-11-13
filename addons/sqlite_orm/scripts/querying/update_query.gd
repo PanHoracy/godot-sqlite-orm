@@ -45,7 +45,10 @@ func set_value(column: ORMColumn, value: Variant) -> ORMUpdate:
 		return self
 	
 	#OPTION Could add here a check that would prevent user form entering invalid data
-	_values_to_set[column.name] = str(value)
+	if value == null:
+		_values_to_set[column.name] = "NULL"
+	else:
+		_values_to_set[column.name] = str(value)
 	
 	return self
 

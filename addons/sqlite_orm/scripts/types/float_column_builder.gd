@@ -18,5 +18,12 @@ func set_unique(value: bool = true) -> ORMFloatColumnBuilder:
 	return super.set_unique(value)
 
 
+func set_old_names(...values: Array) -> ORMFloatColumnBuilder:
+	super.set_old_names(values)
+	return self
+
+
 func build() -> ORMFloatColumn:
-	return ORMFloatColumn.new(_not_null, _unique, _use_default, _default)
+	var result := ORMFloatColumn.new(_not_null, _unique, _use_default, _default)
+	result._old_names = _old_names
+	return result

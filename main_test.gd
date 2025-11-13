@@ -2,7 +2,7 @@ extends Control
 
 
 func _ready() -> void:
-	print(DB.leaderboard.get_all())
+	pass
 
 
 func read_all_from_test_table() -> void:
@@ -13,6 +13,61 @@ func read_all_from_test_table() -> void:
 func read_all_from_product() -> void:
 	for entry in DB.product.get_all():
 		print(entry)
+
+
+func insert_things_to_recereate_table() -> void:
+	var entry := RecreationTableORMEntry.new()
+	
+	entry.column_to_remove = "Val1"
+	entry.column_to_rename = "Val1"
+	entry.column_with_changed_default = "Val1"
+	entry.column_to_not_null = 1
+	entry.column_to_not_null_with_default = 1
+	entry.column_to_unique = 1
+	
+	DB.recreation_table.put_entry_into_table(entry)
+	
+	entry.column_to_remove = "Val2"
+	entry.column_to_rename = "Val2"
+	entry.column_with_changed_default = "Val2"
+	entry.column_to_not_null = 1
+	entry.column_to_not_null_with_default = 1
+	entry.column_to_unique = 2
+	
+	DB.recreation_table.put_entry_into_table(entry)
+	
+	entry.column_to_remove = "Val3"
+	entry.column_to_rename = "Val3"
+	entry.column_with_changed_default = "Val3"
+	entry.column_to_not_null = 2
+	entry.column_to_not_null_with_default = 2
+	entry.column_to_unique = 1
+	
+	DB.recreation_table.put_entry_into_table(entry)
+	
+	entry.column_to_remove = "Val4"
+	entry.column_to_rename = "Val4"
+	entry.column_with_changed_default = "Val4"
+	entry.column_to_not_null = 3
+	entry.column_to_not_null_with_default = 3
+	entry.column_to_unique = 2
+	
+	DB.recreation_table.put_entry_into_table(entry)
+	
+	entry.column_to_remove = "Val5"
+	entry.column_to_rename = "Val5"
+	entry.column_with_changed_default = "Val5"
+	entry.column_to_not_null = 1
+	entry.column_to_not_null_with_default = 1
+	entry.column_to_unique = 3
+	
+	DB.recreation_table.put_entry_into_table(entry)
+	
+	DB.recreation_table.create_update_query()\
+		.set_value(DB.recreation_table.column_to_not_null, null)\
+		.set_value(DB.recreation_table.column_to_not_null_with_default, null)\
+		.where(DB.recreation_table.id.value_in(2, 5))\
+		.update()
 
 
 func insert_things_to_test_table() -> void:

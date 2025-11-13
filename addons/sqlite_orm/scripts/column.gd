@@ -4,8 +4,13 @@ class_name ORMColumn extends ORMConditionElement
 var name: String = ""
 var _not_null: bool = false
 var _unique: bool = false
+var _old_names: Array[String] = []
 
 var _table: ORMTable = null
+
+
+func get_old_names() -> Array[String]:
+	return _old_names
 
 
 func get_column_dict() -> Dictionary:

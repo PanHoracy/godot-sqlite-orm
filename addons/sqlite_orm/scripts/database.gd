@@ -7,7 +7,7 @@ signal tables_ready
 
 const _UTILS := preload("res://addons/sqlite_orm/scripts/common/utils.gd")
 
-@onready var _tables: Array[ORMTable] = [test_table, producer_table, leaderboard, ]
+@onready var _tables: Array[ORMTable] = [test_table, recreation_table, producer_table, leaderboard, ]
 
 var _db: SQLite
 var _db_path: String
@@ -41,6 +41,7 @@ class EvaluationResult:
 
 #region Tables
 var test_table: TestTableORM = TestTableORM.new()
+var recreation_table: RecreationTableORM = RecreationTableORM.new()
 var product_table: ProductTableORM
 var product_review: ProductReviewORM
 var producer_table: ProducerTableORM = ProducerTableORM.new()
@@ -95,6 +96,9 @@ func get_table_schema(table_name: String) -> Dictionary[String, Dictionary]:
 				data_type = "text"
 			"BLOB":
 				data_type = "blob"
+				if default_value != null:
+					#FIXME This will probably not work
+					default_value = PackedByteArray(default_value)
 			_:
 				assert(false, "Unreacognized type")
 		var not_null: bool = column_dict["notnull"] == 1
@@ -192,7 +196,7 @@ func _ready() -> void:
 	
 	var evaluation_result: EvaluationResult = _evaluate_database()
 	print(evaluation_result)
-	#TODO add more ways to handle cases of altered database
+	
 	if not evaluation_result.missing_tables.is_empty():
 		_create_tables(evaluation_result.missing_tables)
 	if not evaluation_result.invalid_tables.is_empty():
@@ -202,11 +206,15 @@ func _ready() -> void:
 	if not evaluation_result.missing_columns.is_empty():
 		for table: ORMTable in evaluation_result.missing_columns.keys():
 			if not tables_to_recreate.has(table):
-				tables_to_recreate[table] = []
+				tables_to_recreate[table] = evaluation_result.missing_columns[table]
+			else:
+				tables_to_recreate[table].append_array(evaluation_result.missing_columns[table])
 	if not evaluation_result.invalid_columns.is_empty():
 		for table: ORMTable in evaluation_result.invalid_columns.keys():
 			if not tables_to_recreate.has(table):
-				tables_to_recreate[table] = []
+				tables_to_recreate[table] = evaluation_result.invalid_columns[table]
+			else:
+				tables_to_recreate[table].append_array(evaluation_result.invalid_columns[table])
 	if not evaluation_result.altered_columns.is_empty():
 		for table: ORMTable in evaluation_result.altered_columns.keys():
 			if not tables_to_recreate.has(table):
@@ -275,9 +283,86 @@ func _evaluate_database() -> EvaluationResult:
 
 
 func _recreate_table_preserve_data(table: ORMTable, altered_columns: Array[String]) -> void:
-	#TODO Implement table recreating with current entries evaluation to fit new schema
-	# this can be done only after data insertion is imlepemented
+	#TODO Add options to controll how recreation is performed (or to skip it entirely)
 	print("Recreate table %s, with altered columns %s" % [table, altered_columns])
+	
+	var query := "SELECT * FROM %s" % table.get_name()
+	var table_content := _run_query_and_get_result_array(query)
+	
+	_db.drop_table(table.get_name())
+	_db.create_table(table.get_name(), table.get_table_dict())
+	
+	var insert_rows: Array[Dictionary] = []
+	var columns: Array[ORMColumn] = table.get_all_columns()
+	var columns_dict := table.get_table_dict()
+	
+	var default_values: Dictionary[String, Variant] = {}
+	for column in columns:
+		default_values[column.name] = columns_dict[column.name]["default"] if columns_dict[column.name].has("default") else null
+	
+	for old_row in table_content:
+		var new_row := {}
+		for column in columns:
+			var names: Array[String] = column.get_old_names()
+			names.push_back(column.name)
+			
+			for cname in names:
+				if old_row.has(cname):
+					new_row[column.name] = old_row[cname]
+			
+			if not new_row.has(column.name):
+				new_row[column.name] = default_values[column.name]
+		insert_rows.push_back(new_row)
+	
+	var rows_to_ommit: Array[int] = []
+	var unique_rows_values: Dictionary[String, Array] = {}
+	for column in columns:
+		if columns_dict[column.name]["unique"]:
+			unique_rows_values[column.name] = []
+	
+	for row_id in insert_rows.size():
+		var row: Dictionary = insert_rows[row_id]
+		for column in columns:
+			var column_dict: Dictionary = columns_dict[column.name]
+			var value = row[column.name]
+			
+			if columns_dict[column.name]["data_type"] == "int":
+				if value is not int:
+					value = default_values[column.name]
+			elif columns_dict[column.name]["data_type"] == "real":
+				if value is not float:
+					value = default_values[column.name]
+			elif columns_dict[column.name]["data_type"] == "text":
+				if value is not String:
+					value = default_values[column.name]
+			elif columns_dict[column.name]["data_type"] == "blob":
+				if value is not PackedByteArray:
+					value = default_values[column.name]
+			
+			if column_dict["not_null"]:
+				if value == null:
+					if default_values[column.name] == null:
+						rows_to_ommit.push_back(row_id)
+						print("- Row:\n%s\n will not be moved to recereated table because it does not meet the not null constraint on column %s" % [table_content[row_id], column.name])
+						break
+					else:
+						print("- Row:\n%s\n value on %s column will be set to default value to meet not null constraint")
+						value = default_values[column.name]
+			
+			if column_dict["unique"]:
+				if unique_rows_values[column.name].has(value):
+					rows_to_ommit.push_back(row_id)
+					print("- Row:\n%s\n will not be moved to recereated table because it does not meet the unique constraint on column %s" % [table_content[row_id], column.name])
+					break
+				else:
+					unique_rows_values[column.name].push_back(value)
+	
+	var final_insert_rows: Array[Dictionary] = []
+	for id in insert_rows.size():
+		if not rows_to_ommit.has(id):
+			final_insert_rows.push_back(insert_rows[id])
+	
+	_db.insert_rows(table.get_name(), final_insert_rows)
 
 
 func _create_tables(tables: Array[ORMTable]) -> void:
