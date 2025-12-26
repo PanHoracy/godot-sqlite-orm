@@ -398,27 +398,31 @@ func _run_query(query: String) -> bool:
 
 #region Select Helper methods
 
-func AS(column: Variant, alias: String) -> ORMSelectAs:
-	return ORMSelectAs.new(column, alias)
+func AS(column: Variant, alias: String) -> ORMAggregateFunction:
+	return ORMAggregateFunction.new("{column} AS {alias}", column, ["alias", alias])
 
 
-func AVG(column: Variant) -> ORMSelectAvg:
-	return ORMSelectAvg.new(column)
+func AVG(column: Variant) -> ORMAggregateFunction:
+	return ORMAggregateFunction.new("AVG(column)", column)
 
 
-func COUNT(column: Variant) -> ORMSelectCount:
-	return ORMSelectCount.new(column)
+func COUNT(column: Variant) -> ORMAggregateFunction:
+	return ORMAggregateFunction.new("COUNT({column})", column)
 
 
-func MAX(column: Variant) -> ORMSelectMax:
-	return ORMSelectMax.new(column)
+func MAX(column: Variant) -> ORMAggregateFunction:
+	return ORMAggregateFunction.new("MAX({column})", column)
 
 
-func MIN(column: Variant) -> ORMSelectMin:
-	return ORMSelectMin.new(column)
+func MIN(column: Variant) -> ORMAggregateFunction:
+	return ORMAggregateFunction.new("MIN({column})", column)
 
 
-func SUM(column: Variant) -> ORMSelectSum:
-	return ORMSelectSum.new(column)
+func SUM(column: Variant) -> ORMAggregateFunction:
+	return ORMAggregateFunction.new("SUM({column})", column)
+
+
+func GROUP_CONCAT(column: Variant, separator: String = ",") -> ORMAggregateFunction:
+	return ORMAggregateFunction.new("GROUP_CONCAT({column}, '{separator}')", column, ["separator", separator])
 
 #endregion

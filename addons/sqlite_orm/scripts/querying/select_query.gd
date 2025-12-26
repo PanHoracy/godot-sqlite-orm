@@ -11,6 +11,7 @@ func select(...selection: Array) -> ORMSelect:
 		return
 	
 	#TODO This needs to be revorked for automatic join table resolution
+	
 	#var first_entry = selection[0]
 	#if first_entry is ORMColumn:
 		#_from_table = first_entry.get_table().get_name()
@@ -21,7 +22,7 @@ func select(...selection: Array) -> ORMSelect:
 			#push_error("Array passed to select contains null (can't deduce form table)")
 		#else:
 			#_from_table = first_entry[0].get_table().get_name()
-	#elif first_entry is ORMSelectHelperBase:
+	#elif first_entry is ORMAggregateFunction:
 		#_from_table = first_entry.get_from_table()
 	#else:
 		#push_error("Unsupported value passed to select (accepted types: ORMColumn)")
@@ -35,7 +36,7 @@ func select(...selection: Array) -> ORMSelect:
 					push_error("Array passed to select contains null")
 					continue
 				_selected.push_back(column.get_name_with_table())
-		elif entry is ORMSelectHelperBase:
+		elif entry is ORMAggregateFunction:
 			_selected.push_back(entry.get_selection_string())
 		else:
 			push_error("Unsupported value passed to select (accepted types: ORMColumn)")

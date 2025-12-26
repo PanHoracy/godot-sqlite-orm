@@ -2,7 +2,19 @@ extends Control
 
 
 func _ready() -> void:
-	pass
+	var result := ORMSelect.new()\
+		.select(
+			DB.leaderboard.player_name, 
+			DB.AS(DB.MAX(DB.leaderboard.score), "highscore"),
+			DB.AS(DB.GROUP_CONCAT(DB.leaderboard.score, " - "), "Scores")
+			)\
+		.from(DB.leaderboard)\
+		.group_by(DB.leaderboard.player_name)\
+		.order_by_desc(DB.leaderboard.score)\
+		.get_as_raw_result()
+	
+	for entry in result:
+		print(entry)
 
 
 func read_all_from_test_table() -> void:

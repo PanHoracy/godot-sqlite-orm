@@ -72,7 +72,7 @@ func group_by(columns: Array) -> ORMSelectBase:
 	for entry in columns:
 		if entry is ORMColumn:
 			_group_by_columns.push_back(entry.get_name_with_table())
-		elif entry is ORMSelectHelperBase and not entry is ORMSelectAs:
+		elif entry is ORMAggregateFunction:
 			_group_by_columns.push_back(entry.get_selection_string())
 		else:
 			push_error("Value passed to group by is invalid")
